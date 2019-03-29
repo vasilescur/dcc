@@ -1,6 +1,4 @@
-# Duke 250/16 C Compiler
-
-![logo](logo.png)
+<img src="logo.png" height="250px">
 
 This is a C compiler targeting the Duke 250/16 architecture.
 
