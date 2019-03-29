@@ -1,0 +1,11 @@
+/Users/vasilescur/Programming/C-Compiler/bin/Debug/netcoreapp2.2/DCC.deps.json
+/Users/vasilescur/Programming/C-Compiler/bin/Debug/netcoreapp2.2/DCC.runtimeconfig.json
+/Users/vasilescur/Programming/C-Compiler/bin/Debug/netcoreapp2.2/DCC.runtimeconfig.dev.json
+/Users/vasilescur/Programming/C-Compiler/bin/Debug/netcoreapp2.2/DCC.dll
+/Users/vasilescur/Programming/C-Compiler/bin/Debug/netcoreapp2.2/DCC.pdb
+/Users/vasilescur/Programming/C-Compiler/obj/Debug/netcoreapp2.2/DCC.csprojAssemblyReference.cache
+/Users/vasilescur/Programming/C-Compiler/obj/Debug/netcoreapp2.2/DCC.csproj.CoreCompileInputs.cache
+/Users/vasilescur/Programming/C-Compiler/obj/Debug/netcoreapp2.2/DCC.AssemblyInfoInputs.cache
+/Users/vasilescur/Programming/C-Compiler/obj/Debug/netcoreapp2.2/DCC.AssemblyInfo.cs
+/Users/vasilescur/Programming/C-Compiler/obj/Debug/netcoreapp2.2/DCC.dll
+/Users/vasilescur/Programming/C-Compiler/obj/Debug/netcoreapp2.2/DCC.pdb
