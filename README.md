@@ -79,6 +79,31 @@ To build, run:
 dotnet build
 ```
 
+## The Duke 250/16 Architecture
+
+The Duke 250/16 is a 16-bit MIPS-like, word-addressed RISC architecture created for educational purposes in the `COMPSCI 250` course at Duke University.
+
+### Instruction Set
+
+| Instruction 	| Opcode 	| Type 	| Usage                  	| Operation                                                                                                                                                                                                    	|
+|-------------	|--------	|------	|------------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| lw          	| 0      	| I    	| lw $rt, Imm($rs)       	| $rt = Mem[$rs+Imm]                                                                                                                                                                                           	|
+| sw          	| 1      	| I    	| sw $rt, Imm($rs)       	| Mem[$rs+Imm] = $rt                                                                                                                                                                                           	|
+| beq         	| 10     	| I    	| beq $rs, $rt, Imm      	| if ($rs==$rt) then PC=PC+1+Imm                                                                                                                                                                               	|
+| blt         	| 11     	| I    	| blt $rs, $rt, Imm      	| if ($rs<$rt) then PC=PC+1+Imm                                                                                                                                                                                	|
+| not         	| 100    	| R    	| not $rd, $rs           	| $rd = NOT $rs                                                                                                                                                                                                	|
+| xor         	| 101    	| R    	| xor $rd, $rs, $rt      	| $rd = $rs XOR $rt                                                                                                                                                                                            	|
+| addi        	| 110    	| I    	| addi $rt, $rs, Imm     	| $rt=$rs+Imm                                                                                                                                                                                                  	|
+| add         	| 111    	| R    	| add $rd, $rs, $rt      	| $rd=$rs+$rt                                                                                                                                                                                                  	|
+| sub         	| 1000   	| R    	| sub $rd, $rs, $rt      	| $rd=$rs-$rt                                                                                                                                                                                                  	|
+| shra        	| 1001   	| R    	| shra $rd, $rs, <shamt> 	| $rd = $rs shifted <shamt> to right (arithmetic shift that preserves sign); shamt is unsigned. Arithmetic shift means that the bits shifted in on the left are the same as the original most-significant bit. 	|
+| shl         	| 1010   	| R    	| slh $rd, $rs, <shamt>  	| $rd = $rs shifted <shamt> to left;  shamt is unsigned.                                                                                                                                                       	|
+| j           	| 1011   	| J    	| jL                     	| PC = L (upper 4 bits same)                                                                                                                                                                                   	|
+| jal         	| 1100   	| J    	| jal L                  	| $r7=PC+1; PC = L                                                                                                                                                                                             	|
+| jr          	| 1101   	| R    	| jr $rs                 	| PC = $rs                                                                                                                                                                                                     	|
+| output      	| 1110   	| R    	| output $rs             	| print $rs on a TTY display                                                                                                                                                                                   	|
+| input       	| 1111   	| R    	| input $rd              	| $rd = keyboard input                                                                                                                                                                                         	|
+
 ## Roadmap
 
 ### Compilation Process
