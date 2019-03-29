@@ -87,10 +87,10 @@ The Duke 250/16 is a 16-bit MIPS-like, word-addressed RISC architecture created 
 
 | Instruction  	| Opcode 	| Type 	| Usage                  	| Operation
 |---------  	|--------	|------	|------------------------	|------------
-| `lw`         	| `0`      	| `I`  	| `lw $rt, Imm($rs)`       	| `$rt = Mem[$rs+Imm]`
-| `sw`         	| `1`      	| `I`  	| `sw $rt, Imm($rs)`       	| `Mem[$rs+Imm] = $rt`
-| `beq`        	| `10`     	| `I`  	| `beq $rs, $rt, Imm`      	| `if ($rs==$rt) then PC=PC+1+Imm`
-| `blt`        	| `11`     	| `I`  	| `blt $rs, $rt, Imm`      	| `if ($rs<$rt) then PC=PC+1+Imm`
+| `lw`         	| `000`    	| `I`  	| `lw $rt, Imm($rs)`       	| `$rt = Mem[$rs+Imm]`
+| `sw`         	| `001`    	| `I`  	| `sw $rt, Imm($rs)`       	| `Mem[$rs+Imm] = $rt`
+| `beq`        	| `010`   	| `I`  	| `beq $rs, $rt, Imm`      	| `if ($rs==$rt) then PC=PC+1+Imm`
+| `blt`        	| `011`   	| `I`  	| `blt $rs, $rt, Imm`      	| `if ($rs<$rt) then PC=PC+1+Imm`
 | `not`        	| `100`    	| `R`  	| `not $rd, $rs`           	| `$rd = NOT $rs`
 | `xor`        	| `101`    	| `R`  	| `xor $rd, $rs, $rt`      	| `$rd = $rs XOR $rt`
 | `addi`       	| `110`    	| `I`  	| `addi $rt, $rs, Imm`     	| `$rt=$rs+Imm`
