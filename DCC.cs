@@ -1,4 +1,10 @@
-﻿using System;
+﻿///<summary>
+///Main class and entry point for the C compiler.
+///</summary>
+///<author>Radu Vasilecu</author>
+///<date>2019-03-29</date>
+
+using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,10 +39,26 @@ namespace DCC {
             source = Preprocessor.ProcessAll(source);
 
             // Print the source
+            System.Console.WriteLine("Preprocessed Source: \n");
             PrintSource(source);
+            System.Console.WriteLine("\n");
 
             // Tokenize the source
-            var tokenized = Tokenizer.Tokenize(source);
+            Tokenizer toker = new Tokenizer();
+            List<Token> tokenized = null;
+
+            try {
+                tokenized = toker.Tokenize(source);
+            } catch (Tokenizer.TokenException e) {
+                Console.Error.WriteLine("Error: " + e.Message);
+                Environment.Exit(1);
+            }
+
+            // Debug only-- print the tokens
+            System.Console.WriteLine("\nTokenized Program: \n");
+            foreach (Token t in tokenized) {
+                System.Console.WriteLine(t);
+            }
         }
 
         private static void PrintSource(List<string> source) {

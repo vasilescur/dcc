@@ -1,3 +1,10 @@
+///<summary>
+///The Preprocessor manipulates the raw source code before it is tokenized, performing
+///operations like removing comments and empty lines and resolving <c>#include</c> statements.
+///</summary>
+///<author>Radu Vasilecu</author>
+///<date>2019-03-29</date>
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
