@@ -96,7 +96,7 @@ The Duke 250/16 is a 16-bit MIPS-like, word-addressed RISC architecture created 
 | `addi`       	| `110`    	| `I`  	| `addi $rt, $rs, Imm`     	| `$rt=$rs+Imm`
 | `add`        	| `111`    	| `R`  	| `add $rd, $rs, $rt`      	| `$rd=$rs+$rt`
 | `sub`        	| `1000`   	| `R`  	| `sub $rd, $rs, $rt`      	| `$rd=$rs-$rt`
-| `shra`       	| `1001`   	| `R`  	| `shra $rd, $rs, <shamt>` 	| `$rd` = `$rs` shifted `<shamt>` to right (arithmetic shift that preserves sign)
+| `shra`       	| `1001`   	| `R`  	| `shra $rd, $rs, <shamt>` 	| `$rd` = `$rs` shifted `<shamt>` to right
 | `shl`        	| `1010`   	| `R`  	| `slh $rd, $rs, <shamt>`  	| `$rd` = `$rs` shifted `<shamt>` to left
 | `j`          	| `1011`   	| `J`  	| `j L`                    	| `PC = L` (upper 4 bits same)
 | `jal`        	| `1100`   	| `J`  	| `jal L`                  	| `$r7=PC+1; PC = L`
