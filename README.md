@@ -85,7 +85,7 @@ The Duke 250/16 is a 16-bit MIPS-like, word-addressed RISC architecture created 
 
 ### Instruction Set
 
-| Instn.       	| Opcode 	| Type 	| Usage                  	| Operation
+| Instruction  	| Opcode 	| Type 	| Usage                  	| Operation
 |---------  	|--------	|------	|------------------------	|------------
 | `lw`         	| `0`      	| `I`  	| `lw $rt, Imm($rs)`       	| `$rt = Mem[$rs+Imm]`
 | `sw`         	| `1`      	| `I`  	| `sw $rt, Imm($rs)`       	| `Mem[$rs+Imm] = $rt`
