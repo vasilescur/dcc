@@ -110,12 +110,12 @@ The Duke 250/16 is a 16-bit MIPS-like, word-addressed RISC architecture created 
 
 - [x] Basic source code parsing
 - [x] Preprocessing
-- [ ] Tokenization
+- [x] Tokenization
 - [ ] Parsing into AST
-- [ ] ...?
 - [ ] Optimization (long-term, low-priority)
-- [ ] Code generation
-    - [ ] Targeting regular MIPS
+- Code generation
+    - [ ] Targeting Duke 250/16
+    - [ ] Targeting regular MIPS (long-term, low-priority)
     - [ ] Targeting x86 (long-term, low-priority)
 
 ### Language Features
