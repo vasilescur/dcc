@@ -31,10 +31,17 @@ namespace DCC {
 
         class Variable : Expression {
             public string name;
+            public VarType type;
+
+            public enum VarType {
+                Int, IntPtr, Void
+            }
         }
 
-            class Pointer : Variable { }
-
+            class GlobalVariable : Variable {
+                public int initValue;
+            }
+    
     abstract class Action { }
 
         class Instruction : Action {

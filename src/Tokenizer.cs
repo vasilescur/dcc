@@ -109,7 +109,6 @@ namespace DCC {
                 Token nextToken = consumeNextToken(ref restSource);
                 lastToken = nextToken;
                 result.Add(nextToken);
-                System.Console.WriteLine("Token: " + nextToken.ToString());
                 done++;
             } while (result.Last().type != EOF && done < 100);
 
@@ -197,7 +196,9 @@ namespace DCC {
             else if (char.IsDigit(restSource.TrimStart().ToString()[0])) {
                 return new Token(LiteralInt, restSource.ConsumeWhile(c => char.IsDigit(c)));
             } else if (restSource.TrimStart().StartsWith("'")) {
-                return new Token(LiteralChar, restSource.ConsumeUntil("'"));
+                Token result = new Token(LiteralChar, restSource.ConsumeUntil("'"));
+                restSource.Consume(1);     // Get rid of traling '
+                return result;
             }
 
             //* Type names
