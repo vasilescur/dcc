@@ -2,7 +2,9 @@
 
 This is a C compiler targeting the Duke 250/16 architecture.
 
-This project is still very much a work in progress.
+This project is still very much a work in progress. The end goal is to be able to compile a large enough subset of the C
+language to be sufficient for general-purpose demonstrations and implementation of simple algorithms. If I can eventually get 
+`HoopsStats.c` compiled and running on this, I'll be a happy man.
 
 ## Instructions
 
