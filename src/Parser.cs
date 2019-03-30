@@ -48,9 +48,15 @@ namespace DCC {
             return source[position - 1];
         }
 
-        public void Parse() {
+        public AbstractProgram Parse() {
+            this.program = new AbstractProgram();
+
             // Process all items in the global scope
             while (Peek().type != Token.TokenType.EOF) {
+                while (Peek().type == Token.TokenType.Semicolon) {
+                    Consume(Token.TokenType.Semicolon);
+                }
+
                 // For a global object, first token will always be the type
                 Token typeName = Consume(Token.TokenType.TypeName);
                 
@@ -143,12 +149,21 @@ namespace DCC {
 
                     // Now, we need the actions/instructions contained in the function!
 
+                    //TODO
 
+                    // For debugging only
+                    while (true) {
+                        if (Consume().type == Token.TokenType.BraceClose) {
+                            break;
+                        }
+                    }
 
                 } else {
                     throw new UnexpectedTokenException(Consume());
                 }
             }
+
+            return this.program;
         }
 
         [System.Serializable]

@@ -59,6 +59,25 @@ namespace DCC {
             foreach (Token t in tokenized) {
                 System.Console.WriteLine(t);
             }
+
+            System.Console.WriteLine("Parsing...");
+
+            // Parse the tokenized program into a collection of Abstract Source Trees
+            Parser parser = new Parser(tokenized);
+            AbstractProgram parsedProgram = parser.Parse();
+
+            System.Console.WriteLine("Done parsing.");
+
+            // Generate and emit assembly instructions
+            Emitter emitter = new Emitter(parsedProgram);
+            List<string> outputCode = emitter.EmitAssembly();
+
+            System.Console.WriteLine("Done emitting.");
+
+            System.Console.WriteLine("\n\nAssembly: \n");
+            foreach (string line in outputCode) {
+                System.Console.WriteLine(line);
+            }
         }
 
         private static void PrintSource(List<string> source) {

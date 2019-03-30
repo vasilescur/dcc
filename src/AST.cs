@@ -84,6 +84,11 @@ namespace DCC {
 
     class AbstractProgram {
         public List<Function> functions;
-        public List<Variable> globalVars;
+        public List<GlobalVariable> globalVars;
+
+        public AbstractProgram() {
+            this.functions = new List<Function>();
+            this.globalVars = new List<GlobalVariable>();
+        }
     }
 }
