@@ -158,7 +158,7 @@ the stack.
 - [x] Comments and white space
 - [x] Preprocessor `#include`
 - [ ] Preprocessor `#define`
-- [ ] Global (static memory) variables
+- [x] Global (static memory) variables
 - [ ] Functions
 - [ ] Locally-scoped (stack) variables
 - [ ] Basic arithmetic operations
@@ -170,7 +170,7 @@ the stack.
     - [ ] `if` and `else`
     - [ ] `for` and `while` loops
     - [ ] `switches` (long-term, low-priority)
-- [ ] `enum`s
+- [ ] `enum`s (low-priority)
 - [ ] `struct`s
     - [ ] `typedef`
 - [ ] Dynamic memory allocation library (`malloc`, `free`)
