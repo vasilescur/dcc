@@ -120,6 +120,10 @@ namespace DCC {
                             returnType = Variable.VarType.IntPtr;
                         } break;
 
+                        case "void": {
+                            returnType = Variable.VarType.Void;
+                        } break;
+
                         default: {
                             throw new InvalidTypeException(typeName.content);
                         }
@@ -196,7 +200,7 @@ namespace DCC {
         private bool EndOfExpr() {
             return (new List<Token.TokenType> {
                 Token.TokenType.ParenClose,
-                Token.TokenType.Comma
+                Token.TokenType.Semicolon
             }.Contains(Peek().type));
         }
 
@@ -420,7 +424,7 @@ namespace DCC {
                     Token inlineAsm = Consume(Token.TokenType.Assembly);
 
                     actions.Add(new InlineAssembly() {
-                        code = inlineAsm.content
+                        code = inlineAsm.content.Split(";").ToList()
                     });
                 } else if (Peek().type == Token.TokenType.KwIf) {
                     Consume(Token.TokenType.KwIf);
@@ -463,13 +467,24 @@ namespace DCC {
                 else if (Peek().type == Token.TokenType.KwReturn) {
                     Consume(Token.TokenType.KwReturn);
 
-                    Expression returnValue = ParseExpression();
-                    actions.Add(new ReturnInstruction() {
-                        returnValue = returnValue
-                    });
+                    if (Peek().type == Token.TokenType.Semicolon) {
+                        Consume(Token.TokenType.Semicolon);
+                        actions.Add(new ReturnInstruction() {
+                            returnValue = null
+                        });
+                    } else {
+                        Expression returnValue = ParseExpression();
+                        actions.Add(new ReturnInstruction() {
+                            returnValue = returnValue
+                        });
+                    }
                 } else {
                     throw new UnexpectedTokenException(Consume());
                 }
+            }
+
+            if (Peek().type == Token.TokenType.BraceClose) {
+                Consume(Token.TokenType.BraceClose);
             }
 
             return actions;
@@ -479,17 +494,17 @@ namespace DCC {
         public class UnexpectedTokenException : System.Exception
         {
             public UnexpectedTokenException() : base("Unexpected Token.") { 
-                Environment.Exit(1);
+                //Environment.Exit(1);
             }
 
             public UnexpectedTokenException(Token offender) : base("Unexpected Token: " + offender.ToString()) { 
-                Environment.Exit(1);
+                //Environment.Exit(1);
             }
 
             public UnexpectedTokenException(Token offender, Token.TokenType expected) : base(
                 "Unexpected Token: " + offender.ToString() + " (expected " + expected.ToString() + ")"
             ) {
-                Environment.Exit(1);
+                //Environment.Exit(1);
             }
         }
 
@@ -497,11 +512,11 @@ namespace DCC {
         public class InvalidTypeException : System.Exception
         {
             public InvalidTypeException() : base("Invalid Type.") { 
-                Environment.Exit(1);
+                //Environment.Exit(1);
             }
 
             public InvalidTypeException(string offender) : base("Invalid Type: " + offender.ToString()) { 
-                Environment.Exit(1);
+                //Environment.Exit(1);
             }
         }
     }

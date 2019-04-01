@@ -88,7 +88,7 @@ namespace DCC {
             }
 
             class InlineAssembly : Instruction {
-                public string code;
+                public List<string> code;
             }
 
             class ReturnInstruction : Instruction {

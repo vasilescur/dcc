@@ -5,8 +5,8 @@ void putc(int c) {
     // accessible by lw from $r6
 
     asm ("
-        lw $r1, 0($r6);
-        output $r1;
+        lw      $r1,    0($r6);
+        output  $r1;
     ");
 
     return;
@@ -14,7 +14,7 @@ void putc(int c) {
 
 int getc() {
     asm ("
-        input $r5;
+        input   $r5;
     ");
 
     return;

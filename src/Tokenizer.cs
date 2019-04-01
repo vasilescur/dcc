@@ -240,12 +240,14 @@ namespace DCC {
                 restSource = restSource.TrimStart();
 
                 string inlineAsm = restSource.ConsumeUntil("\"");
-                inlineAsm = inlineAsm.Replace(';', '\n');
+
+                List<string> instructions = inlineAsm.Split(";").ToList();
+                instructions.ForEach(i => i = i.Trim());
 
                 restSource.ConsumeUntil(";");
                 restSource.Consume(1);
 
-                return new Token(Assembly, inlineAsm);
+                return new Token(Assembly, String.Join(";", instructions));
             }
 
             //* Labels and Goto

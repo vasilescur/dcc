@@ -74,7 +74,9 @@ namespace DCC {
 
             System.Console.WriteLine("Done emitting.");
 
+            System.Console.WriteLine(" ");
             System.Console.WriteLine("\n\nAssembly: \n");
+            System.Console.WriteLine(" ");
             foreach (string line in outputCode) {
                 System.Console.WriteLine(line);
             }
