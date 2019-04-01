@@ -6,6 +6,8 @@ This project is still very much a work in progress. The end goal is to be able t
 language to be sufficient for general-purpose demonstrations and implementation of simple algorithms. If I can eventually get 
 `HoopsStats.c` compiled and running on this, I'll be a happy man.
 
+**Completion Status**: `35%`. As of now, it can read source code, and spit out a completed `.data` section and a tokenized version of the instruction source code. Working on parser --> AST.
+
 ## Instructions
 
 ### Usage
