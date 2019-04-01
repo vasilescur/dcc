@@ -6,7 +6,7 @@ This project is still very much a work in progress. The end goal is to be able t
 language to be sufficient for general-purpose demonstrations and implementation of simple algorithms. If I can eventually get 
 `HoopsStats.c` compiled and running on this, I'll be a happy man.
 
-**Completion Status**: `Not Even Close`
+**Completion Status**: `35%`
 
 ## Instructions
 
