@@ -72,6 +72,22 @@ namespace DCC {
             public enum VarType {
                 Int, IntPtr, Void
             }
+
+            public override bool Equals(object obj) {
+                if (!(obj is Variable)) {
+                    return false;
+                } else {
+                    return (obj as Variable).name == this.name;
+                }
+            }
+
+            public override int GetHashCode() {
+                return this.name.GetHashCode();
+            }
+
+            public override string ToString() {
+                return "[" + this.type.ToString() + " " + this.name + "]";
+            }
         }
 
             class GlobalVariable : Variable {

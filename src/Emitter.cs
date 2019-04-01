@@ -37,6 +37,9 @@ namespace DCC {
             List<string> result = new List<string>();
             result.Add(".data");
 
+            // Emit the initial stack pointer value
+            result.Add("__sp_init: .word 32767");
+
             foreach (GlobalVariable variable in program.globalVars) {
                 StringBuilder currentLine = new StringBuilder("");
 
@@ -70,7 +73,11 @@ namespace DCC {
 
             // First, we need to set up the stack.
             // This stack starts at 0x7FFF = 32767
-            result.Add("    addi    $r6, $r0, 32767");
+            // This is too big to do an addi, so we have to load it from memory
+            //result.Add("    addi    $r6, $r0, 32767");
+            result.Add("    la      $r1,    __sp_init");
+            result.Add("    lw      $r6,    0($r1)");
+            result.Add("    xor     $r1,    $r1,    $r1");
 
             // Our entry point will be the function _main, so the first real instruction
             // should be a jump to that function.
@@ -132,25 +139,152 @@ namespace DCC {
                         foreach (string line in (action as InlineAssembly).code) {
                             result.Add("    " + line);
                         }
+                    } else if (action is ReturnInstruction) {
+                        if (!((action as ReturnInstruction).returnValue is null)) {
+                            // Need to evaluate the returnValue and place it in $r5
+                            // $r5 isn't on the stack, so we have to define a new temp variable
+                            Variable tempResult = new Variable() {
+                                name = "__temp_expr", 
+                                type = Variable.VarType.Int
+                            };
+
+                            result.Add("    addi    $r6,    $r6,    -1");
+                            stackMap.Add(tempResult, 0);
+
+                            List<string> steps = EvaluateExpression(
+                                (action as ReturnInstruction).returnValue,
+                                tempResult,
+                                ref stackMap
+                            );
+
+                            result.AddRange(steps);
+
+                            // Result is now in tempResult. Need to put it in $r5 and then jr $ra
+
+                            result.Add("    xor     $r5,    $r5,    $r5");
+                            result.Add("    lw      $r5,    " + stackMap[tempResult] + "($r6)");
+
+                            // Restore the dirty stack
+                            stackMap.Remove(tempResult);
+                            result.Add("    addi    $r6,    $r6,    1");
+                        }
+
+                        result.AddRange(GenerateReturn(stackSize));
+                    } else if (action is FunctionCall) {
+                        // First, we need to evaluate each argument onto the stack
+                        // How many args?
+                        int numArgs = (action as FunctionCall).arguments.Count;
+
+                        if (numArgs > 4) {
+                            throw new ArgumentException(
+                                "Can't have more than 4 arguments (" + (action as FunctionCall).function.name + ")"
+                            );
+                        }
+
+                        // Evaluate all arguments --> 
+                        for (int argNum = 1; argNum <= numArgs; argNum++) {
+                            Variable tempResult = new Variable() {
+                                name = "__temp_expr", 
+                                type = Variable.VarType.Int
+                            };
+
+                            result.Add("    addi    $r6,    $r6,    -1");
+                            stackMap.Add(tempResult, 0);
+
+                            List<string> steps = EvaluateExpression(
+                                (action as FunctionCall).arguments[argNum - 1],
+                                tempResult,
+                                ref stackMap
+                            );
+
+                            result.AddRange(steps);
+
+                            // Result is now in tempResult. Need to put it in correct arg register
+
+                            result.Add(
+                                "    lw      $r" + argNum.ToString() + ",    " + stackMap[tempResult] + "($r6)"
+                            );
+
+                            // Restore the dirty stack
+                            stackMap.Remove(tempResult);
+                            result.Add("    addi    $r6,    $r6,    1");
+                        }
+
+                        // Now, do the function call
+                        string calleeName = (action as FunctionCall).function.name;
+
+                        result.Add("    jal     " + calleeName);
                     }
                 }
-
-                // Restore registers from the stack
-
-                // Store the registers on the stack
-                result.Add("    lw      $r1,    0($r6)");
-                result.Add("    lw      $r2,    1($r6)");
-                result.Add("    lw      $r3,    2($r6)");
-                result.Add("    lw      $r4,    3($r6)");
-                result.Add("    lw      $r7,    4($r6)");
-
-                // Discard the stack frame
-                result.Add("    addi    $r6,    $r6,    " + stackSize.ToString());
-
-                // Return from the function
-                result.Add("    jr      $r7");
-                result.Add("");
             }
+
+            return result;
+        }
+
+        private List<string> EvaluateExpression(Expression expression, 
+                                                Variable dest, 
+                                                ref Dictionary<Variable, int> stackMap) {
+            List<string> result = new List<string>();
+
+            if (expression is LiteralConstant) {
+                if (stackMap.ContainsKey(dest)) {
+                    // Destination is already on the stack.
+                    int destOffset = stackMap[dest];
+
+                    // Need to back up $r1, set $r1 to the value, then 
+                    // sw $r1 --> stack[offset], then restore $r1
+
+                    result.Add("    addi    $r6,    $r6,    -1");       // Expand the stack
+                    result.Add("    sw      $r1,    0($r6)");           // Backup $r1 to stack
+                    result.Add("    xor     $r1,    $r1,    $r1");      // Zero out $r1
+
+                    int newVal = (expression as LiteralConstant).value;
+                    while (newVal > 31) {
+                        result.Add(
+                            "    addi    $r1,    $r1,    31"
+                        );
+
+                        newVal -= 31;
+                    }
+
+                    result.Add(
+                        "    addi    $r1,    $r1,    "
+                        + newVal.ToString()  // Set $r1 = literal value
+                    );
+
+                    result.Add(
+                        "    sw      $r1,    " + (destOffset + 1).ToString()    // Write to stack[dest]
+                        + "($r6)"   // Offset of destOffset + 1 because we backed up $r1 to stack
+                    );
+                    result.Add("    lw      $r1,    0($r6)");           // Restore $r1 from stack
+                    result.Add("    addi    $r6,    $r6,    1");       // Restore the stack
+
+                    return result;
+                } else {
+                    // Destination doesn't exist on the stack.
+                    throw new ArgumentOutOfRangeException("Destination: " + dest.ToString() + " not on stack.");
+                }
+            } else {
+                throw new NotImplementedException("Only supports evaluation of literal constants.");
+            }
+        }
+
+        private List<string> GenerateReturn(int stackSize) {
+            List<string> result = new List<string>();
+
+            // Store the registers on the stack
+            result.Add("    lw      $r1,    0($r6)");
+            result.Add("    lw      $r2,    1($r6)");
+            result.Add("    lw      $r3,    2($r6)");
+            result.Add("    lw      $r4,    3($r6)");
+            result.Add("    lw      $r7,    4($r6)");
+
+            // Discard the stack frame
+            result.Add("    addi    $r6,    $r6,    " + stackSize.ToString());
+
+            // Return from the function
+            result.Add("    jr      $r7");
+            result.Add("");
 
             return result;
         }
