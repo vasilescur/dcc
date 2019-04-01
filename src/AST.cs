@@ -1,3 +1,8 @@
+///<summary>An Abstract Syntax Tree is an abstract representation of a program using
+///a tree, with nodes being semantic units of evaluation. This class contains a rich
+///object-oriented schema for defining Abstract Syntax Trees.
+///</summary>
+
 using System;
 using System.Collections;
 using System.Collections.Generic;

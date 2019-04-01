@@ -1,3 +1,6 @@
+///<summary>**NOTE**: Currently unused.
+///</summary>
+
 using System;
 using System.Collections;
 using System.Collections.Generic;

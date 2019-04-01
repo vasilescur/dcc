@@ -16,6 +16,8 @@ using System.Linq;
 using static DCC.Token.TokenType;
 
 namespace DCC {
+    ///<summary>Represents one semantic unit of the source program.
+    ///</summary>
     class Token {
         public string content;
         public TokenType type;
@@ -77,6 +79,9 @@ namespace DCC {
             Assembly,
         }
 
+        ///<summary>Checks whether this <c>Token</c> is one of the listed types of expression
+        ///operators.
+        ///</summary>
         public static bool IsExpressionOperator(Token token) {
             return new List<TokenType> {
                 OpTestEq, OpTestGreater, OpTestLess, OpTestGreaterEq, OpTestLessEq,

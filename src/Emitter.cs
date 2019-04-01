@@ -20,6 +20,8 @@ namespace DCC {
             this.program = program;
         }
 
+        ///<summary>Generates a full assembly language program from the given <c>AbstractProgram</c>.
+        ///</summary>
         public List<string> EmitAssembly() {
             List<string> fullAsm = new List<string>();
 
@@ -29,6 +31,8 @@ namespace DCC {
             return fullAsm;
         }
 
+        ///<summary>Generates the <c>.data</c> section of an assembly language program.
+        ///</summary>
         private List<string> EmitDataSection() {
             List<string> result = new List<string>();
             result.Add(".data");
@@ -58,6 +62,8 @@ namespace DCC {
             return result;
         }
 
+        ///<summary>Generates the <c>.text</c> section of an assembly language program.
+        ///</summary>
         private List<string> EmitTextSection() {
             List<string> result = new List<string>();
             result.Add(".text");

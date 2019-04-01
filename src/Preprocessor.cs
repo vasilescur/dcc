@@ -21,6 +21,7 @@ namespace DCC {
                 result.Add(line);
             }
 
+            // This order is important.
             ProcessIncludes(result);
             //TODO: #define statements!
             result = StripComments(result);
@@ -66,6 +67,9 @@ namespace DCC {
             source.RemoveAll(line => line.Length == 0 || line == "\n");
         }
 
+        ///<summary>Appends the content of each include file to the place in the source code where
+        ///the <c>#include</c> directive appeared, and removes the directive.
+        ///</summary>
         private static void ProcessIncludes(List<string> source) {
             Dictionary<int, string> requestedIncludes = new Dictionary<int, string>();
 
