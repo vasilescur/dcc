@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace DCC {
-    abstract class Expression { }
+    interface Expression { }
 
         abstract class Operation : Expression {
             public OperationType operationType;
@@ -42,18 +42,34 @@ namespace DCC {
                 public int initValue;
             }
     
-    abstract class Action { }
+    interface Action { }
 
-        class Instruction : Action {
-            public Instruction.Type instructionType;
-            public List<Expression> parameters;
+        interface Instruction : Action { }
 
-            public enum Type {
-                Assignment, VarDeclare, FuncCall, Return, Assembly
+            class FunctionCall : Instruction, Expression {
+                public Function function;
+                public List<Expression> arguments;
             }
-        }
 
-        abstract class ControlFlowUnit : Action { }
+            class InlineAssembly : Instruction {
+                public string code;
+            }
+
+            class ReturnInstruction : Instruction {
+                public Expression returnValue;
+            }
+
+            class LocalVarDeclaration : Instruction {
+                public Variable variable;
+                public int initValue;
+            }
+
+            class VarAssignment : Instruction {
+                public Variable variable;
+                public Expression newValue;
+            }
+
+        interface ControlFlowUnit : Action { }
 
             class If : ControlFlowUnit {
                 public Expression condition;

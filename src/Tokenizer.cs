@@ -76,6 +76,13 @@ namespace DCC {
             // Inline Assembly
             Assembly,
         }
+
+        public static bool IsExpressionOperator(Token token) {
+            return new List<TokenType> {
+                OpTestEq, OpTestGreater, OpTestLess, OpTestGreaterEq, OpTestLessEq,
+                OpPlus, OpMinus, OpNot, OpXor, OpShiftLeft, OpShiftRight
+            }.Contains(token.type);
+        }
     }
 
     class Tokenizer {

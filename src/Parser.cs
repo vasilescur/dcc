@@ -104,59 +104,17 @@ namespace DCC {
                     program.globalVars.Add(newVar);
 
                 } else if (Peek().type == Token.TokenType.FuncName) {
-                    // typeName : Token - already consumed
+                    // typeName : Token - already consumed --> Return Value
 
                     string newFuncName = Consume(Token.TokenType.FuncName).content;
 
                     // Now, we need to read the function's arguments
-                    Consume(Token.TokenType.ParenOpen);
+                    List<Variable> newArgs = ParseFunctionSignature();
 
-                    List<Variable> newArgs = new List<Variable>();
-
-                    while (Peek().type == Token.TokenType.TypeName) {
-                        string argTypeName = Consume(Token.TokenType.TypeName).content;
-                        Variable.VarType argType;
-
-                        switch (argTypeName) {
-                            case "int": {
-                                argType = Variable.VarType.Int;
-                            } break;
-
-                            case "int*": {
-                                argType = Variable.VarType.IntPtr;
-                            } break;
-
-                            default: {
-                                throw new InvalidTypeException(argTypeName);
-                            }
-                        }
-
-                        string argName = Consume(Token.TokenType.VarName).content;
-
-                        newArgs.Add(new Variable() {
-                            name = argName,
-                            type = argType
-                        });
-
-                        // Set ourselves up for the next type name, if there is one
-                        if (Peek().type == Token.TokenType.Comma) {
-                            Consume(Token.TokenType.Comma);
-                        }
-                    }
-
-                    Consume(Token.TokenType.ParenClose);
                     Consume(Token.TokenType.BraceOpen);
 
                     // Now, we need the actions/instructions contained in the function!
-
-                    //TODO
-
-                    // For debugging only
-                    while (true) {
-                        if (Consume().type == Token.TokenType.BraceClose) {
-                            break;
-                        }
-                    }
+                    List<Action> actions = ParseBlock();                    
 
                 } else {
                     throw new UnexpectedTokenException(Consume());
@@ -164,6 +122,108 @@ namespace DCC {
             }
 
             return this.program;
+        }
+
+        private List<Variable> ParseFunctionSignature() {
+            Consume(Token.TokenType.ParenOpen);
+
+            List<Variable> newArgs = new List<Variable>();
+
+            while (Peek().type == Token.TokenType.TypeName) {
+                string argTypeName = Consume(Token.TokenType.TypeName).content;
+                Variable.VarType argType;
+
+                switch (argTypeName) {
+                    case "int": {
+                        argType = Variable.VarType.Int;
+                    } break;
+
+                    case "int*": {
+                        argType = Variable.VarType.IntPtr;
+                    } break;
+
+                    default: {
+                        throw new InvalidTypeException(argTypeName);
+                    }
+                }
+
+                string argName = Consume(Token.TokenType.VarName).content;
+
+                newArgs.Add(new Variable() {
+                    name = argName,
+                    type = argType
+                });
+
+                // Set ourselves up for the next type name, if there is one
+                if (Peek().type == Token.TokenType.Comma) {
+                    Consume(Token.TokenType.Comma);
+                }
+            }
+
+            Consume(Token.TokenType.ParenClose);
+
+            return newArgs;
+        }
+
+        private Expression ParseExpression() {
+            bool EndOfExpr() {
+                return (new List<Token.TokenType> {
+                    Token.TokenType.ParenClose,
+                    Token.TokenType.Comma
+                }.Contains(Peek().type));
+            }
+
+            // What's the first token?
+            if (Peek().type == Token.TokenType.LiteralInt) {
+                Expression firstLiteral = new LiteralConstant() {
+                    value = int.Parse(Consume(Token.TokenType.LiteralInt).content)
+                };
+
+                if (EndOfExpr()) {    // End of expression
+                    return firstLiteral;    // The expression was just an int literal
+                }
+            
+                if (Token.IsExpressionOperator(Peek())) {   // +, -, ==, >>, etc
+                    Token opToken = Consume();
+
+                    Operation.OperationType opType;
+
+                    switch(opToken.type) {
+                        case Token.TokenType.OpTestEq: {
+                            
+                        } break;
+                    }
+                }
+            }
+
+            throw new NotImplementedException();
+        }
+
+        private List<Expression> ParseFunctionArguments() {
+            List<Expression> result = new List<Expression>();
+
+            Consume(Token.TokenType.ParenOpen);
+
+
+            
+            Consume(Token.TokenType.ParenClose);
+
+            return result;
+        }
+
+        private List<Action> ParseBlock() {
+            List<Action> actions = new List<Action>();
+
+            int nestLevel = 0;
+
+            // Instructions
+            if (Peek().type == Token.TokenType.FuncName) {  // Means we are calling a void function
+                string fnName = Consume(Token.TokenType.FuncName).content;
+                List<Expression> arguments = ParseFunctionArguments();
+
+            }
+
+            return actions;
         }
 
         [System.Serializable]
