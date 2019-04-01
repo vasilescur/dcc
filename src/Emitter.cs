@@ -68,7 +68,13 @@ namespace DCC {
             List<string> result = new List<string>();
             result.Add(".text");
 
+            foreach (Function func in program.functions) {
+                System.Console.WriteLine("\nFunction: " + func.name);
 
+                foreach (Action act in func.actions) {
+                    System.Console.WriteLine("  Action: " + act.ToString());
+                }
+            }
 
             return result;
         }

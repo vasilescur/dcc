@@ -20,6 +20,37 @@ namespace DCC {
                 Not, Xor, ShiftLeft, ShiftRight,
                 Dereference, AddressOf
             }
+
+            public static OperationType ParseType(Token opToken) {
+                var lookup = new Dictionary<Token.TokenType, OperationType> {
+                    { Token.TokenType.OpPlus, OperationType.Addition },
+                    { Token.TokenType.OpMinus, OperationType.Subtraction },
+                    { Token.TokenType.OpTestEq, OperationType.TestEq },
+                    { Token.TokenType.OpTestGreater, OperationType.TestGt },
+                    { Token.TokenType.OpTestLess, OperationType.TestLt },
+                    { Token.TokenType.OpTestGreaterEq, OperationType.TestGeq },
+                    { Token.TokenType.OpTestLessEq, OperationType.TestLeq },
+                    { Token.TokenType.OpIncrement, OperationType.Increment },
+                    { Token.TokenType.OpDecrement, OperationType.Decrement },
+                    { Token.TokenType.OpNot, OperationType.Not },
+                    { Token.TokenType.OpXor, OperationType.Xor },
+                    { Token.TokenType.OpShiftLeft, OperationType.ShiftLeft },
+                    { Token.TokenType.OpShiftRight, OperationType.ShiftRight },
+                    { Token.TokenType.OpDereference, OperationType.Dereference },
+                    { Token.TokenType.OpAddressOf, OperationType.AddressOf }
+                };
+
+                return lookup[opToken.type];
+            }
+
+            public static bool IsTwoParam(OperationType opType) {
+                return new List<OperationType>() {
+                    OperationType.Addition, OperationType.Subtraction, OperationType.TestEq,
+                    OperationType.TestGt, OperationType.TestLt, OperationType.TestGeq,
+                    OperationType.TestLeq, OperationType.Xor, OperationType.ShiftLeft,
+                    OperationType.ShiftRight
+                }.Contains(opType);
+            }
         }
 
             class SingleParamOperation : Operation {
@@ -74,6 +105,10 @@ namespace DCC {
                 public Expression newValue;
             }
 
+                class GlobalVarAssignment : VarAssignment { 
+                    new public GlobalVariable variable;
+                }
+
         interface ControlFlowUnit : Action { }
 
             class If : ControlFlowUnit {
@@ -98,9 +133,10 @@ namespace DCC {
 
     class Function {
         public string name;
-        public Type returnsValue;
+        public Variable.VarType returnsValue;
         public List<Variable> arguments;
         public List<Action> actions;
+        public List<Variable> localVars;
     }
 
     class AbstractProgram {
