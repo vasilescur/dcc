@@ -227,7 +227,7 @@ int main() {
 
 ### Compiled Assembly Output
 
-```mips
+```assembly
 .text
     # Set up the stack pointer 
     la      $r1,    __sp_init
