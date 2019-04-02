@@ -3,7 +3,7 @@
 using System;
 using System.Text;
 
-namespace DCC {
+namespace dcc {
     public static class StringBuilderExtension {
 
         ///<summary>Implementation of the <c>String</c> class's <c>Substring</c method, but for the

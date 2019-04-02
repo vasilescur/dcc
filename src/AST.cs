@@ -7,7 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace DCC {
+namespace dcc {
     interface Expression { }
 
         abstract class Operation : Expression {

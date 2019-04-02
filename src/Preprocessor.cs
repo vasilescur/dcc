@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.IO;
 
-namespace DCC {
+namespace dcc {
     static class Preprocessor {
         public static List<string> ProcessAll(List<string> source) {
             List<string> result = new List<string>();

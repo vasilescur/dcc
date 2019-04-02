@@ -13,9 +13,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using static DCC.Token.TokenType;
+using static dcc.Token.TokenType;
 
-namespace DCC {
+namespace dcc {
     ///<summary>Represents one semantic unit of the source program.
     ///</summary>
     class Token {

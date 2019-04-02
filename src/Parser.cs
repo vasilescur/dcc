@@ -11,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DCC {
+namespace dcc {
     class Parser {
         public AbstractProgram program;
         public List<Token> source;
@@ -333,8 +333,6 @@ namespace DCC {
 
         private List<Action> ParseBlock() {
             List<Action> actions = new List<Action>();
-
-            int nestLevel = 0;
 
             while (Peek().type != Token.TokenType.BraceClose) {
                 if (Peek().type == Token.TokenType.Semicolon) {

@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DCC {
+namespace dcc {
     class Program {
         public List<string> source;
 

@@ -10,17 +10,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DCC {
-    class DCC {
+namespace dcc {
+    class dcc {
         static Program program;
 
         static void Main(string[] args) {
             System.Console.WriteLine("\nDuke 250/16 C Compiler version 1.0 - Radu Vasilescu, 2019\n");
 
-            if (args.Length != 1) {
+            if (args.Length == 0) {
                 System.Console.WriteLine();
                 ShowHelpText();
                 return;
+            }
+
+            bool verbose = false;
+            string sourceFile = "";
+
+            foreach (string arg in args) {
+                if (arg == "-v" || arg == "--verbose") {
+                    verbose = true;
+                } else if (arg == "-h" || arg == "--help") {
+                    ShowHelpText();
+                    Environment.Exit(0);
+                } else {
+                    sourceFile = arg;
+                }
             }
 
             // Read the source file
@@ -28,7 +42,7 @@ namespace DCC {
             List<string> source = null;
 
             try {
-                sourceStr = File.ReadAllLines(args[0]);
+                sourceStr = File.ReadAllLines(sourceFile);
                 source = sourceStr.OfType<string>().ToList();
             } catch (Exception e) {
                 Console.Error.WriteLine("Error: " + e.Message);
@@ -37,11 +51,6 @@ namespace DCC {
 
             // Run the pre-processor
             source = Preprocessor.ProcessAll(source);
-
-            // Print the source
-            System.Console.WriteLine("Preprocessed Source: \n");
-            PrintSource(source);
-            System.Console.WriteLine("\n");
 
             // Tokenize the source
             Tokenizer toker = new Tokenizer();
@@ -54,32 +63,34 @@ namespace DCC {
                 Environment.Exit(1);
             }
 
-            // Debug only-- print the tokens
-            System.Console.WriteLine("\nTokenized Program: \n");
-            foreach (Token t in tokenized) {
-                System.Console.WriteLine(t);
-            }
-
-            System.Console.WriteLine("Parsing...");
+            if (verbose) System.Console.WriteLine("Parsing...");
 
             // Parse the tokenized program into a collection of Abstract Source Trees
             Parser parser = new Parser(tokenized);
             AbstractProgram parsedProgram = parser.Parse();
 
-            System.Console.WriteLine("Done parsing.");
+            if (verbose) System.Console.WriteLine("Done parsing.");
 
             // Generate and emit assembly instructions
             Emitter emitter = new Emitter(parsedProgram);
             List<string> outputCode = emitter.EmitAssembly();
 
-            System.Console.WriteLine("Done emitting.");
+            if (verbose) System.Console.WriteLine("Done emitting.");
 
-            System.Console.WriteLine(" ");
-            System.Console.WriteLine("\n\nAssembly: \n");
-            System.Console.WriteLine(" ");
-            foreach (string line in outputCode) {
-                System.Console.WriteLine(line);
+            if (verbose) {
+                System.Console.WriteLine("\nAssembly: \n");
+
+                foreach (string line in outputCode) {
+                    System.Console.WriteLine(line);
+                }
             }
+            
+            string outputFile = sourceFile.Split(".")[0] + ".s";
+            string outputCodeStr = String.Join("\n", outputCode);
+
+            File.WriteAllText(outputFile, outputCodeStr);
+
+            if (verbose) System.Console.WriteLine("\nOutput stored in: " + outputFile);
         }
 
         private static void PrintSource(List<string> source) {
@@ -89,7 +100,12 @@ namespace DCC {
         }
 
         static void ShowHelpText() {
-            System.Console.WriteLine("Usage: dcc program.c");
+            System.Console.WriteLine("Usage: dcc [-v | --verbose] program.c");
+            System.Console.WriteLine();
+            System.Console.WriteLine("Options: ");
+            System.Console.WriteLine("    -h    --help          Display this help message.");
+            System.Console.WriteLine("    -v    --verbose       Print steps and progress, and output the");
+            System.Console.WriteLine("                          assembled result to the console.");
             System.Console.WriteLine();
         }
     }
