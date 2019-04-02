@@ -214,6 +214,36 @@ namespace DCC {
                         string calleeName = (action as FunctionCall).function.name;
 
                         result.Add("    jal     " + calleeName);
+                    } else if (action is LocalVarDeclaration) {
+                        // The variable already exists!
+                        // Only need to do something if we are initializing it with a value.
+                        Variable target = (action as LocalVarDeclaration).variable;
+                        Expression newVal = (action as LocalVarDeclaration).initValue;
+
+                        // Need to evaluate the new value and place it in the target
+
+                        List<string> steps = EvaluateExpression(
+                            newVal,
+                            target,
+                            ref stackMap
+                        );
+
+                        result.AddRange(steps);                        
+                    } else if (action is VarAssignment) {
+                        // The variable already exists!
+                        // Only need to do something if we are initializing it with a value.
+                        Variable target = (action as VarAssignment).variable;
+                        Expression newVal = (action as VarAssignment).newValue;
+
+                        // Need to evaluate the new value and place it in the target
+
+                        List<string> steps = EvaluateExpression(
+                            newVal,
+                            target,
+                            ref stackMap
+                        );
+
+                        result.AddRange(steps);
                     }
                 }
             }
@@ -226,18 +256,18 @@ namespace DCC {
                                                 ref Dictionary<Variable, int> stackMap) {
             List<string> result = new List<string>();
 
-            if (expression is LiteralConstant) {
-                if (stackMap.ContainsKey(dest)) {
-                    // Destination is already on the stack.
-                    int destOffset = stackMap[dest];
+            if (stackMap.ContainsKey(dest)) {
+                // Destination is already on the stack.
+                int destOffset = stackMap[dest];
 
-                    // Need to back up $r1, set $r1 to the value, then 
-                    // sw $r1 --> stack[offset], then restore $r1
+                // Need to back up $r1, set $r1 to the value, then 
+                // sw $r1 --> stack[offset], then restore $r1
 
-                    result.Add("    addi    $r6,    $r6,    -1");       // Expand the stack
-                    result.Add("    sw      $r1,    0($r6)");           // Backup $r1 to stack
-                    result.Add("    xor     $r1,    $r1,    $r1");      // Zero out $r1
+                result.Add("    addi    $r6,    $r6,    -1");       // Expand the stack
+                result.Add("    sw      $r1,    0($r6)");           // Backup $r1 to stack
+                result.Add("    xor     $r1,    $r1,    $r1");      // Zero out $r1
 
+                if (expression is LiteralConstant) {
                     int newVal = (expression as LiteralConstant).value;
                     while (newVal > 31) {
                         result.Add(
@@ -251,21 +281,30 @@ namespace DCC {
                         "    addi    $r1,    $r1,    "
                         + newVal.ToString()  // Set $r1 = literal value
                     );
+                } else if (expression is Variable) {
+                    // This is a simple one. Simply get the variable's value and put it in $r1
+                    int sourceOffset = stackMap[(expression as Variable)];
 
-                    result.Add(
-                        "    sw      $r1,    " + (destOffset + 1).ToString()    // Write to stack[dest]
-                        + "($r6)"   // Offset of destOffset + 1 because we backed up $r1 to stack
-                    );
-                    result.Add("    lw      $r1,    0($r6)");           // Restore $r1 from stack
-                    result.Add("    addi    $r6,    $r6,    1");       // Restore the stack
+                    result.Add("    lw      $r1,    " + (sourceOffset + 2) + "($r6)");
+                } else if (expression is Operation) {
 
-                    return result;
-                } else {
-                    // Destination doesn't exist on the stack.
-                    throw new ArgumentOutOfRangeException("Destination: " + dest.ToString() + " not on stack.");
                 }
+                
+                else {
+                    throw new NotImplementedException("Only supports evaluation of literal constants.");
+                }
+
+                result.Add(
+                    "    sw      $r1,    " + (destOffset + 1).ToString()    // Write to stack[dest]
+                    + "($r6)"   // Offset of destOffset + 1 because we backed up $r1 to stack
+                );
+                result.Add("    lw      $r1,    0($r6)");           // Restore $r1 from stack
+                result.Add("    addi    $r6,    $r6,    1");       // Restore the stack
+
+                return result;
             } else {
-                throw new NotImplementedException("Only supports evaluation of literal constants.");
+                // Destination doesn't exist on the stack.
+                throw new ArgumentOutOfRangeException("Destination: " + dest.ToString() + " not on stack.");
             }
         }
 

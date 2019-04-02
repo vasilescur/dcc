@@ -8,7 +8,15 @@ int* testPtr = 4906;
 int uninit;
 
 int main() {
+
+    int secondChar = 49;
+
     putc(48);   // "0"
+    putc(secondChar);
+
+    secondChar = 50;
+    putc(secondChar);
+
     putc(10);   // "\n"
 
     return 0;

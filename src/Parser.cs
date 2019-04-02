@@ -375,20 +375,17 @@ namespace DCC {
                         }
                     }
 
-                    int initValue;
+                    Expression initValue;
 
                     // Are we initializing with a value?
                     if (Peek().type == Token.TokenType.OpAssign) {
                         Consume(Token.TokenType.OpAssign);
 
-                        // Is it an int or a char?
-                        if (Peek().type == Token.TokenType.LiteralChar) {
-                            initValue = Consume(Token.TokenType.LiteralChar).content[0];
-                        } else {
-                            initValue = int.Parse(Consume(Token.TokenType.LiteralInt).content);
-                        }
+                        initValue = ParseExpression();                        
                     } else {
-                        initValue = 0;  // Default value is 0
+                        initValue = new LiteralConstant() {
+                            value = 0
+                        };
                     }
 
                     Variable newVar = new Variable {
@@ -404,6 +401,7 @@ namespace DCC {
                 } else if (Peek().type == Token.TokenType.VarName) {
                     // Variable assignment!
                     Token targetName = Consume(Token.TokenType.VarName);
+                    Consume(Token.TokenType.OpAssign);
 
                     // What value?
                     Expression newVal = ParseExpression();

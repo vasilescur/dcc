@@ -113,7 +113,7 @@ namespace DCC {
 
             class LocalVarDeclaration : Instruction {
                 public Variable variable;
-                public int initValue;
+                public Expression initValue;
             }
 
             class VarAssignment : Instruction {
