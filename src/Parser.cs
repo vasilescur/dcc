@@ -219,6 +219,19 @@ namespace dcc {
                     return restOfExpr;
                 }
 
+            } else if (Peek().type == Token.TokenType.LiteralChar) {
+                Expression firstLiteral = new LiteralConstant() {
+                    value = char.Parse(Consume(Token.TokenType.LiteralChar).content)
+                };
+            
+                var restOfExpr = RestOfExpr(firstLiteral);
+
+                if (restOfExpr is null) {
+                    return firstLiteral;
+                } else {
+                    return restOfExpr;
+                }
+                
             } else if (Peek().type == Token.TokenType.ParenOpen) {
                 // Sub-expression
                 Consume(Token.TokenType.ParenOpen);

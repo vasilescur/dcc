@@ -208,6 +208,7 @@ namespace dcc {
             else if (char.IsDigit(restSource.TrimStart().ToString()[0])) {
                 return new Token(LiteralInt, restSource.ConsumeWhile(c => char.IsDigit(c)));
             } else if (restSource.TrimStart().StartsWith("'")) {
+                restSource.Consume(1);
                 Token result = new Token(LiteralChar, restSource.ConsumeUntil("'"));
                 restSource.Consume(1);     // Get rid of traling '
                 return result;

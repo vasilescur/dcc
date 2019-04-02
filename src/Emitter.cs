@@ -13,6 +13,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace dcc {
+    static class UniqueIdentifier {
+        private static int currentValue = 0;
+
+        public static int Next() {
+            int result = currentValue;
+            currentValue++;
+            return result;
+        }
+
+        public static string NextStr() {
+            return Next().ToString();
+        }
+    }
+
     class Emitter {
         AbstractProgram program;
 
@@ -38,8 +52,11 @@ namespace dcc {
             result.Add(".data");
 
             // Emit the initial stack pointer value
+            result.Add("# Initial stack pointer value");
             result.Add("__sp_init: .word 32767");
+            result.Add("");
 
+            result.Add("# Global Variables: ");
             foreach (GlobalVariable variable in program.globalVars) {
                 StringBuilder currentLine = new StringBuilder("");
 
@@ -75,12 +92,14 @@ namespace dcc {
             // This stack starts at 0x7FFF = 32767
             // This is too big to do an addi, so we have to load it from memory
             //result.Add("    addi    $r6, $r0, 32767");
+            result.Add("    # Set up the stack pointer ");
             result.Add("    la      $r1,    __sp_init");
             result.Add("    lw      $r6,    0($r1)");
             result.Add("    xor     $r1,    $r1,    $r1");
 
             // Our entry point will be the function _main, so the first real instruction
             // should be a jump to that function.
+            result.Add("\n    # Jump to the entry point");
             result.Add("    jal     main");
 
             // When we return back here, need to halt!
@@ -105,6 +124,7 @@ namespace dcc {
                 stackSize += 5;
                 stackSize += function.localVars.Count;
 
+                result.Add("    # Allocate stack space and back up registers");
                 result.Add("    addi    $r6,    $r6,    -" + stackSize.ToString());
 
                 // Store the registers on the stack
@@ -131,136 +151,196 @@ namespace dcc {
                     i++;
                 }
 
-                result.Add("");
-
                 // Emit actual code for instructions.
                 foreach (Action action in function.actions) {
-                    if (action is InlineAssembly) {
-                        foreach (string line in (action as InlineAssembly).code) {
-                            result.Add("    " + line);
-                        }
-                    } else if (action is ReturnInstruction) {
-                        if (!((action as ReturnInstruction).returnValue is null)) {
-                            // Need to evaluate the returnValue and place it in $r5
-                            // $r5 isn't on the stack, so we have to define a new temp variable
-                            Variable tempResult = new Variable() {
-                                name = "__temp_expr", 
-                                type = Variable.VarType.Int
-                            };
-
-                            result.Add("    addi    $r6,    $r6,    -1");
-                            stackMap.Add(tempResult, 0);
-
-                            List<string> steps = EvaluateExpression(
-                                (action as ReturnInstruction).returnValue,
-                                tempResult,
-                                ref stackMap
-                            );
-
-                            result.AddRange(steps);
-
-                            // Result is now in tempResult. Need to put it in $r5 and then jr $ra
-
-                            result.Add("    xor     $r5,    $r5,    $r5");
-                            result.Add("    lw      $r5,    " + stackMap[tempResult] + "($r6)");
-
-                            // Restore the dirty stack
-                            stackMap.Remove(tempResult);
-                            result.Add("    addi    $r6,    $r6,    1");
-                        }
-
-                        result.AddRange(GenerateReturn(stackSize));
-                    } else if (action is FunctionCall) {
-                        // First, we need to evaluate each argument onto the stack
-                        // How many args?
-                        int numArgs = (action as FunctionCall).arguments.Count;
-
-                        if (numArgs > 4) {
-                            throw new ArgumentException(
-                                "Can't have more than 4 arguments (" + (action as FunctionCall).function.name + ")"
-                            );
-                        }
-
-                        // Evaluate all arguments --> 
-                        for (int argNum = 1; argNum <= numArgs; argNum++) {
-                            Variable tempResult = new Variable() {
-                                name = "__temp_expr", 
-                                type = Variable.VarType.Int
-                            };
-
-                            result.Add("    addi    $r6,    $r6,    -1");
-                            stackMap.Add(tempResult, 0);
-
-                            List<string> steps = EvaluateExpression(
-                                (action as FunctionCall).arguments[argNum - 1],
-                                tempResult,
-                                ref stackMap
-                            );
-
-                            result.AddRange(steps);
-
-                            // Result is now in tempResult. Need to put it in correct arg register
-
-                            result.Add(
-                                "    lw      $r" + argNum.ToString() + ",    " + stackMap[tempResult] + "($r6)"
-                            );
-
-                            // Restore the dirty stack
-                            stackMap.Remove(tempResult);
-                            result.Add("    addi    $r6,    $r6,    1");
-                        }
-
-                        // Now, do the function call
-                        string calleeName = (action as FunctionCall).function.name;
-
-                        result.Add("    jal     " + calleeName);
-                    } else if (action is LocalVarDeclaration) {
-                        // The variable already exists!
-                        // Only need to do something if we are initializing it with a value.
-                        Variable target = (action as LocalVarDeclaration).variable;
-                        Expression newVal = (action as LocalVarDeclaration).initValue;
-
-                        // Need to evaluate the new value and place it in the target
-
-                        List<string> steps = EvaluateExpression(
-                            newVal,
-                            target,
-                            ref stackMap
-                        );
-
-                        result.AddRange(steps);                        
-                    } else if (action is VarAssignment) {
-                        // The variable already exists!
-                        // Only need to do something if we are initializing it with a value.
-                        Variable target = (action as VarAssignment).variable;
-                        Expression newVal = (action as VarAssignment).newValue;
-
-                        // Need to evaluate the new value and place it in the target
-
-                        List<string> steps = EvaluateExpression(
-                            newVal,
-                            target,
-                            ref stackMap
-                        );
-
-                        result.AddRange(steps);
-                    }
+                    EmitActionCode(ref result, action, function, ref stackMap, ref stackSize);
                 }
             }
 
             return result;
         }
 
-        private List<string> EvaluateExpression(Expression expression, 
-                                                Variable dest, 
-                                                ref Dictionary<Variable, int> stackMap) {
+        private void EmitActionCode(ref List<string> result,
+                                    Action action,
+                                    Function function,
+                                    ref Dictionary<Variable, int> stackMap,
+                                    ref int stackSize) {
+            // Emit comment with action ToString header
+            result.Add("\n    # " + action.ToString());
+
+            if (action is InlineAssembly) {
+                foreach (string line in (action as InlineAssembly).code) {
+                    result.Add("    " + line);
+                }
+            } else if (action is ReturnInstruction) {
+                if (!((action as ReturnInstruction).returnValue is null)) {
+                    // Need to evaluate the returnValue and place it in $r5
+                    // $r5 isn't on the stack, so we have to define a new temp variable
+                    Variable tempResult = new Variable() {
+                        name = "__temp_expr",
+                        type = Variable.VarType.Int
+                    };
+
+                    result.Add("    addi    $r6,    $r6,    -1");
+                    stackMap.Add(tempResult, 0);
+
+                    List<string> steps = EvaluateExpression(
+                        (action as ReturnInstruction).returnValue,
+                        tempResult,
+                        ref stackMap,
+                        1
+                    );
+
+                    result.AddRange(steps);
+
+                    // Result is now in tempResult. Need to put it in $r5 and then jr $ra
+
+                    result.Add("    xor     $r5,    $r5,    $r5");
+                    result.Add("    lw      $r5,    " + stackMap[tempResult] + "($r6)");
+
+                    // Restore the dirty stack
+                    stackMap.Remove(tempResult);
+                    result.Add("    addi    $r6,    $r6,    1");
+                }
+
+                result.AddRange(GenerateReturn(stackSize));
+            } else if (action is FunctionCall) {
+                // First, we need to evaluate each argument onto the stack
+                // How many args?
+                int numArgs = (action as FunctionCall).arguments.Count;
+
+                if (numArgs > 4) {
+                    throw new ArgumentException(
+                        "Can't have more than 4 arguments (" + (action as FunctionCall).function.name + ")"
+                    );
+                }
+
+                // Evaluate all arguments -->
+                for (int argNum = 1; argNum <= numArgs; argNum++) {
+                    Variable tempResult = new Variable() {
+                        name = "__temp_expr",
+                        type = Variable.VarType.Int
+                    };
+
+                    result.Add("    addi    $r6,    $r6,    -1");
+                    stackMap.Add(tempResult, 0);
+
+                    List<string> steps = EvaluateExpression(
+                        (action as FunctionCall).arguments[argNum - 1],
+                        tempResult,
+                        ref stackMap,
+                        1
+                    );
+
+                    result.AddRange(steps);
+
+                    // Result is now in tempResult. Need to put it in correct arg register
+
+                    result.Add(
+                        "    lw      $r" + argNum.ToString() + ",    " + stackMap[tempResult] + "($r6)"
+                    );
+
+                    // Restore the dirty stack
+                    stackMap.Remove(tempResult);
+                    result.Add("    addi    $r6,    $r6,    1");
+                }
+
+                // Now, do the function call
+                string calleeName = (action as FunctionCall).function.name;
+
+                result.Add("    jal     " + calleeName);
+            } else if (action is LocalVarDeclaration) {
+                // The variable already exists!
+                // Only need to do something if we are initializing it with a value.
+                Variable target = (action as LocalVarDeclaration).variable;
+                Expression newVal = (action as LocalVarDeclaration).initValue;
+
+                // Need to evaluate the new value and place it in the target
+
+                List<string> steps = EvaluateExpression(
+                    newVal,
+                    target,
+                    ref stackMap,
+                    0
+                );
+
+                result.AddRange(steps);
+            } else if (action is VarAssignment) {
+                // The variable already exists!
+                // Only need to do something if we are initializing it with a value.
+                Variable target = (action as VarAssignment).variable;
+                Expression newVal = (action as VarAssignment).newValue;
+
+                // Need to evaluate the new value and place it in the target
+
+                List<string> steps = EvaluateExpression(
+                    newVal,
+                    target,
+                    ref stackMap,
+                    0
+                );
+
+                result.AddRange(steps);
+            } else if (action is If) {
+                // First, need to evaluate the if condition
+                Expression ifCond = (action as If).condition;
+
+                Variable tempResult = new Variable() {
+                    name = "__temp_expr",
+                    type = Variable.VarType.Int
+                };
+
+                result.Add("    addi    $r6,    $r6,    -2");
+                stackMap.Add(tempResult, 0);
+
+                List<string> steps = EvaluateExpression(
+                    ifCond,
+                    tempResult,
+                    ref stackMap,
+                    2
+                );
+
+                result.AddRange(steps);
+
+                // Result is now in tempResult
+
+                result.Add("    sw      $r1,    1($r6)");
+                result.Add("    lw      $r1,    " + stackMap[tempResult] + "($r6)");
+
+                // Result of condition is now in $r1
+                // Can be either 1 or 0. If it's 1 --> keep going, but if it's 0 --> skip body.
+                string skipLabel = "__if_skip_" + UniqueIdentifier.NextStr();
+
+                result.Add("    beq     $r1,    $r0,    " + skipLabel); // If cond = 0 --> skip
+                result.Add("    lw      $r1,    1($r6)");
+                result.Add("    addi    $r6,    $r6,    1");
+
+                // Body of the IF block
+                foreach (Action ifAction in (action as If).ifActions) {
+                    EmitActionCode(ref result, ifAction, function, ref stackMap, ref stackSize);
+                }
+
+                result.Add("  " + skipLabel + ":");
+
+                // Restore the dirty stack
+                stackMap.Remove(tempResult);
+                result.Add("    addi    $r6,    $r6,    1");
+            }
+        }
+
+        private List<string> EvaluateExpression(Expression expression,
+                                                Variable dest,
+                                                ref Dictionary<Variable, int> stackMap,
+                                                int stackClobber) {
             List<string> result = new List<string>();
+
+            result.Add("    # [EvaluateExpression " + expression.ToString() + "]");
 
             if (stackMap.ContainsKey(dest)) {
                 // Destination is already on the stack.
                 int destOffset = stackMap[dest];
 
-                // Need to back up $r1, set $r1 to the value, then 
+                // Need to back up $r1, set $r1 to the value, then
                 // sw $r1 --> stack[offset], then restore $r1
 
                 result.Add("    addi    $r6,    $r6,    -1");       // Expand the stack
@@ -285,19 +365,101 @@ namespace dcc {
                     // This is a simple one. Simply get the variable's value and put it in $r1
                     int sourceOffset = stackMap[(expression as Variable)];
 
-                    result.Add("    lw      $r1,    " + (sourceOffset + 2) + "($r6)");
-                } else if (expression is Operation) {
+                    result.Add("    lw      $r1,    " + (sourceOffset + stackClobber) + "($r6)");
+                } else if (expression is SingleParamOperation) {
 
-                }
-                
-                else {
+                } else if (expression is TwoParamOperation) {
+                    // Evaluate the operands
+                    Variable leftOperand = new Variable() {
+                        name = "__temp_leftop", 
+                        type = Variable.VarType.Int
+                    };
+
+                    Variable rightOperand = new Variable() {
+                        name = "__temp_rightop",
+                        type = Variable.VarType.Int
+                    };
+
+                    result.Add("    addi    $r6,    $r6,    -2");
+                    stackMap.Add(leftOperand, 0);
+                    stackMap.Add(rightOperand, 1);
+
+                    result.AddRange(EvaluateExpression(
+                        (expression as TwoParamOperation).operands[0],
+                        leftOperand,
+                        ref stackMap,
+                        2
+                    ));
+
+                    result.AddRange(EvaluateExpression(
+                        (expression as TwoParamOperation).operands[1],
+                        rightOperand,
+                        ref stackMap,
+                        2
+                    ));
+
+                    switch ((expression as TwoParamOperation).operationType) {
+                        case Operation.OperationType.TestEq: {
+                            
+                        } break;
+
+                        case Operation.OperationType.TestGt: {
+
+                        } break;
+
+                        case Operation.OperationType.TestLt: {
+
+                        } break;
+
+                        case Operation.OperationType.TestGeq: {
+
+                        } break;
+
+                        case Operation.OperationType.TestLeq: {
+
+                        } break;
+
+                        case Operation.OperationType.Addition: {
+
+                        } break;
+
+                        case Operation.OperationType.Subtraction: {
+
+                        } break;
+
+                        case Operation.OperationType.Xor: {
+
+                        } break;
+
+                        case Operation.OperationType.ShiftLeft: {
+
+                        } break;
+
+                        case Operation.OperationType.ShiftRight: {
+
+                        } break;
+
+                        default: {
+                            throw new InvalidOperationException(
+                                "Invalid operation: "
+                                + (expression as TwoParamOperation).operationType.ToString()
+                            );
+                        }
+                    }
+
+                    // Reset the stack
+                    stackMap.Remove(leftOperand);
+                    stackMap.Remove(rightOperand);
+                    result.Add("    addi    $r6,    $r6,    2");
+                } else {
                     throw new NotImplementedException("Only supports evaluation of literal constants.");
                 }
 
                 result.Add(
-                    "    sw      $r1,    " + (destOffset + 1).ToString()    // Write to stack[dest]
+                    "    sw      $r1,    " + (destOffset + stackClobber).ToString()    // Write to stack[dest]
                     + "($r6)"   // Offset of destOffset + 1 because we backed up $r1 to stack
                 );
+                
                 result.Add("    lw      $r1,    0($r6)");           // Restore $r1 from stack
                 result.Add("    addi    $r6,    $r6,    1");       // Restore the stack
 
@@ -333,9 +495,9 @@ namespace dcc {
 
             if (function.arguments.Count > 0) {
                 for (int i = 0; i < function.arguments.Count; i++) {
-                    header += function.arguments[i].type.ToString() + " " 
+                    header += function.arguments[i].type.ToString() + " "
                                 + function.arguments[i].name;
-                    
+
                     if (i < function.arguments.Count - 1) {
                         header += ", ";
                     }

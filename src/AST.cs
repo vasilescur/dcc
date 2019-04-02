@@ -55,14 +55,27 @@ namespace dcc {
 
             class SingleParamOperation : Operation {
                 public Expression operand;
+
+                public override string ToString() {
+                    return "[Operation " + this.operationType.ToString() + " " + this.operand.ToString() + "]";
+                }
             }
 
             class TwoParamOperation : Operation {
                 public List<Expression> operands;
+
+                public override string ToString() {
+                    return "[Operation " + this.operationType.ToString() + " "
+                        + this.operands[0].ToString() + " " + this.operands[1].ToString() + "]";
+                }
             }
 
         class LiteralConstant : Expression {
             public int value;
+
+            public override string ToString() {
+                return "[Literal " + this.value + "]";
+            }
         }
 
         class Variable : Expression {
@@ -86,12 +99,16 @@ namespace dcc {
             }
 
             public override string ToString() {
-                return "[" + this.type.ToString() + " " + this.name + "]";
+                return "[Variable " + this.type.ToString() + " " + this.name + "]";
             }
         }
 
             class GlobalVariable : Variable {
                 public int initValue;
+
+                public override string ToString() {
+                    return "[GlobalVariable " + this.type.ToString() + " " + this.name + "]";
+                }
             }
     
     interface Action { }
@@ -101,24 +118,55 @@ namespace dcc {
             class FunctionCall : Instruction, Expression {
                 public Function function;
                 public List<Expression> arguments;
+
+                public override string ToString() {
+                    string result = "[FunctionCall " + function.ToString();
+
+                    if (arguments.Count > 0) {
+                        for (int i = 0; i < arguments.Count; i++) {
+                            result += " " + arguments[i].ToString();
+                            if (i < arguments.Count) {
+                                result += ",";
+                            }
+                        }
+                    }
+
+                    return result;
+                }
             }
 
             class InlineAssembly : Instruction {
                 public List<string> code;
+
+                public override string ToString() {
+                    return "[InlineAssembly]";
+                }
             }
 
             class ReturnInstruction : Instruction {
                 public Expression returnValue;
+
+                public override string ToString() {
+                    return "[Return " + (returnValue?.ToString() ?? "") + "]";
+                }
             }
 
             class LocalVarDeclaration : Instruction {
                 public Variable variable;
                 public Expression initValue;
+
+                public override string ToString() {
+                    return "[LocalVarDeclaration " + this.variable.ToString() + " " + this.initValue.ToString() + "]";
+                }
             }
 
             class VarAssignment : Instruction {
                 public Variable variable;
                 public Expression newValue;
+
+                public override string ToString() {
+                    return "[VarAssignment " + this.variable.ToString() + this.newValue.ToString() + "]";
+                }
             }
 
                 class GlobalVarAssignment : VarAssignment { 
@@ -130,21 +178,39 @@ namespace dcc {
             class If : ControlFlowUnit {
                 public Expression condition;
                 public List<Action> ifActions;
+
+                public override string ToString() {
+                    return "[If " + condition.ToString() + "]";
+                }
             }
 
                 class IfElse : If {
                     public List<Action> elseActions;
+
+                    public override string ToString() {
+                        return "[IfEsle " + condition.ToString() + "]";
+                    }
                 }
 
             class While : ControlFlowUnit {
                 public Expression condition;
                 public List<Action> actions;
+
+                public override string ToString() {
+                    return "[While " + condition.ToString() + "]";
+                }
             }
 
             class For : ControlFlowUnit {
                 public Action forSetupAction;
                 public Expression forCondition;
                 public Action forIncrementAction;
+
+                public override string ToString() {
+                    return "[For " + forSetupAction.ToString() 
+                        + " " + forCondition.ToString() 
+                        + " " + forIncrementAction + "]";
+                }
             }
 
     class Function {
@@ -153,6 +219,10 @@ namespace dcc {
         public List<Variable> arguments;
         public List<Action> actions;
         public List<Variable> localVars;
+
+        public override string ToString() {
+            return "[Function " + name + " --> " + returnsValue.ToString() + "]";
+        }
     }
 
     class AbstractProgram {
