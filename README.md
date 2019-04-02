@@ -162,7 +162,7 @@ the stack.
 - [ ] Preprocessor `#define`
 - [x] Global (static memory) variables
 - [x] Functions
-- [ ] Locally-scoped (stack) variables
+- [x] Locally-scoped (stack) variables
 - [ ] Full `Expression` evaluation
 - [ ] Pointers and pointer arithmetic
 - [ ] Array syntax
