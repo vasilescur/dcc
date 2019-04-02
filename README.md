@@ -6,7 +6,7 @@ This project is still very much a work in progress. The end goal is to be able t
 language to be sufficient for general-purpose demonstrations and implementation of simple algorithms. If I can eventually get 
 `HoopsStats.c` compiled and running on this, I'll be a happy man.
 
-**Completion Status**: `35%`. As of now, it can read source code, and spit out a completed `.data` section and a tokenized version of the instruction source code. Working on parser --> AST.
+**Completion Status**: `75%`. As of now, it can compile full programs and call functions and produce I/O, but is missing any sort of math, expression evaluation beyond literals, control flow, or complex operations, as well as local variables.
 
 ## Instructions
 
@@ -148,7 +148,7 @@ the stack.
 - [x] Basic source code parsing
 - [x] Preprocessing
 - [x] Tokenization
-- [ ] Parsing into AST
+- [x] Parsing into AST
 - [ ] Optimization (long-term, low-priority)
 - Code generation
     - [ ] Targeting Duke 250/16
@@ -161,9 +161,9 @@ the stack.
 - [x] Preprocessor `#include`
 - [ ] Preprocessor `#define`
 - [x] Global (static memory) variables
-- [ ] Functions
+- [x] Functions
 - [ ] Locally-scoped (stack) variables
-- [ ] Basic arithmetic operations
+- [ ] Full `Expression` evaluation
 - [ ] Pointers and pointer arithmetic
 - [ ] Array syntax
 - [x] Input and output library (`putc`, `getc`)
