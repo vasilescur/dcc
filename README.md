@@ -151,7 +151,7 @@ the stack.
 - [x] Parsing into AST
 - [ ] Optimization (long-term, low-priority)
 - Code generation
-    - [ ] Targeting Duke 250/16
+    - [x] Targeting Duke 250/16 *(still need file output)*
     - [ ] Targeting regular MIPS (long-term, low-priority)
     - [ ] Targeting x86 (long-term, low-priority)
 
