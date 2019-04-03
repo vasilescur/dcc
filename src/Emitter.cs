@@ -89,6 +89,25 @@ namespace dcc {
             return result;
         }
 
+        class StackMap : Dictionary<Variable, int> {
+            public List<string> Push(Variable variable) {
+                List<string> result = new List<string>();
+
+                // Expand the stack
+                result.Add("    addi    $r6,    $r6,    -1");
+
+                // Shift everything else up by one
+                foreach (Variable existingVar in this.Keys) {
+                    this[existingVar] += 1;
+                }
+
+                // Add the new var at the new bottom of the stack
+                this.Add(variable, 0);
+
+                return result;
+            }
+        }
+
         ///<summary>
         /// Generates the <c>.text</c> section of an assembly language program.
         ///</summary>
@@ -145,7 +164,7 @@ namespace dcc {
                 result.Add("    sw      $r7,    4($r6)");
 
                 // Holds positive (upwards) offsets from the stack pointer
-                Dictionary<Variable, int> stackMap = new Dictionary<Variable, int>();
+                this.stackMap = new Dictionary<Variable, int>();
 
                 int i = 5;  // start off at +5 (after/above registers)
 
@@ -161,7 +180,7 @@ namespace dcc {
 
                 // Emit actual code for instructions.
                 foreach (Action action in function.actions) {
-                    EmitActionCode(ref result, action, function, ref stackMap, ref stackSize);
+                    EmitActionCode(ref result, action, function, ref stackSize);
                 }
             }
 
@@ -171,7 +190,6 @@ namespace dcc {
         private void EmitActionCode(ref List<string> result,
                                     Action action,
                                     Function function,
-                                    ref Dictionary<Variable, int> stackMap,
                                     ref int stackSize) {
             // Emit comment with action ToString header
             result.Add("\n    # " + action.ToString());
