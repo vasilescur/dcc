@@ -163,7 +163,9 @@ the stack.
 - [x] Global (static memory) variables
 - [x] Functions
 - [x] Locally-scoped (stack) variables
-- [ ] Full `Expression` evaluation
+- [x] `Expression` evaluation
+    - [x] Commonly used operations and expressions (ex. `+`, `-`, `==`, etc.)
+    - [ ] Less commonly used operations (ex. `>>`, `>=`, etc.)
 - [ ] Pointers and pointer arithmetic
 - [ ] Array syntax
 - [x] Input and output library (`putc`, `getc`)
