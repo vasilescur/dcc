@@ -12,8 +12,6 @@ using System.Linq;
 
 namespace dcc {
     class dcc {
-        static Program program;
-
         static void Main(string[] args) {
             System.Console.WriteLine("\nDuke 250/16 C Compiler version 1.0 - Radu Vasilescu, 2019\n");
 
@@ -24,6 +22,8 @@ namespace dcc {
             }
 
             bool verbose = false;
+            bool printPreproc = false;
+            bool enableStrout = true;
             string sourceFile = "";
 
             foreach (string arg in args) {
@@ -32,6 +32,10 @@ namespace dcc {
                 } else if (arg == "-h" || arg == "--help") {
                     ShowHelpText();
                     Environment.Exit(0);
+                } else if (arg == "-p" || arg == "--pre-processor") {
+                    printPreproc = true;
+                } else if (arg == "--disable-strout") {
+                    enableStrout = false;
                 } else {
                     sourceFile = arg;
                 }
@@ -50,7 +54,9 @@ namespace dcc {
             }
 
             // Run the pre-processor
-            source = Preprocessor.ProcessAll(source);
+            source = Preprocessor.ProcessAll(source, enableStrout);
+
+            if (printPreproc) PrintSource(source);
 
             // Tokenize the source
             Tokenizer toker = new Tokenizer();

@@ -13,6 +13,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace dcc {
+    ///<summary>
+    /// Allows a program to generate many unique identifiers.
+    /// This is useful for the compiler because we often need to create a uniquely named
+    /// label or variable name that will only be used in a specific scope or action.
+    ///</summary>
     static class UniqueIdentifier {
         private static int currentValue = 0;
 
@@ -34,7 +39,8 @@ namespace dcc {
             this.program = program;
         }
 
-        ///<summary>Generates a full assembly language program from the given <c>AbstractProgram</c>.
+        ///<summary>
+        /// Generates a full assembly language program from the given <c>AbstractProgram</c>.
         ///</summary>
         public List<string> EmitAssembly() {
             List<string> fullAsm = new List<string>();
@@ -45,7 +51,8 @@ namespace dcc {
             return fullAsm;
         }
 
-        ///<summary>Generates the <c>.data</c> section of an assembly language program.
+        ///<summary>
+        /// Generates the <c>.data</c> section of an assembly language program.
         ///</summary>
         private List<string> EmitDataSection() {
             List<string> result = new List<string>();
@@ -82,7 +89,8 @@ namespace dcc {
             return result;
         }
 
-        ///<summary>Generates the <c>.text</c> section of an assembly language program.
+        ///<summary>
+        /// Generates the <c>.text</c> section of an assembly language program.
         ///</summary>
         private List<string> EmitTextSection() {
             List<string> result = new List<string>();
@@ -169,6 +177,8 @@ namespace dcc {
             result.Add("\n    # " + action.ToString());
 
             if (action is InlineAssembly) {
+                // For an inline assembly command, we just need to output all of the lines
+                // directly to the .text section
                 foreach (string line in (action as InlineAssembly).code) {
                     result.Add("    " + line);
                 }
@@ -328,10 +338,28 @@ namespace dcc {
             }
         }
 
+        ///<summary>
+        /// Returns a list of assembly instructions that evaluate a given expression,
+        /// returning the result in a specified <c>dest</c>ination <see>Variable</see>.
+        ///</summary>
         private List<string> EvaluateExpression(Expression expression,
                                                 Variable dest,
                                                 ref Dictionary<Variable, int> stackMap,
                                                 int stackClobber) {
+            /*//TODO: Refactor `stackClobber`
+                We need a better way of handling ad-hoc expands and reductions of the current
+                stack frame. Currently, I use the `stackClobber` variable inconsistently in order
+                to signify that there's a manually applied change from the `stackMap`, and to let
+                this method know that when reading or writing to stack addresses that aren't a part
+                of this evaluation, we need to offset by the `stackClobber`. However, this is dirty
+                and hacky and inconsistent. 
+
+                //* A much better approach would be to maintain the `stackMap` as an absolute invariant,
+                extending its `.Add()` and `.Remove()` methods to update the stack positions of all the
+                other variables. This would eliminate a lot of inconsistencies, hacky patch jobs, and 
+                allow for much easier further expansion to more complicated operations involving the stack.
+            */
+
             List<string> result = new List<string>();
 
             result.Add("    # [EvaluateExpression " + expression.ToString() + "]");
@@ -367,7 +395,9 @@ namespace dcc {
 
                     result.Add("    lw      $r1,    " + (sourceOffset + stackClobber) + "($r6)");
                 } else if (expression is SingleParamOperation) {
+                    //TODO: Single parameter operators.
 
+                    throw new NotImplementedException("Single param operators are not yet supported.");
                 } else if (expression is TwoParamOperation) {
                     // Get an ID
                     string unique = UniqueIdentifier.NextStr();
@@ -391,7 +421,7 @@ namespace dcc {
                         (expression as TwoParamOperation).operands[0],
                         leftOperand,
                         ref stackMap,
-                        1
+                        1   //TODO: Why the hell does this even work? Lol
                     ));
 
                     result.AddRange(EvaluateExpression(
@@ -425,6 +455,7 @@ namespace dcc {
                             result.Add("  __beq_" + ifUnique + ":");
                         } break;
 
+                        //TODO: Other comparisons
                         // case Operation.OperationType.TestGt: {
 
                         // } break;
@@ -468,6 +499,7 @@ namespace dcc {
                             result.Add("    xor     $r1,    $r2,    $r3");
                         } break;
 
+                        //TODO: Shift operators
                         // case Operation.OperationType.ShiftLeft: {
 
                         // } break;
@@ -507,6 +539,10 @@ namespace dcc {
             }
         }
 
+        ///<summary>
+        /// Generates what LLVM would call a "function epilogue", basically resetting the registers
+        /// to the values we backed up onto the stack, discarding the stack frame, and returning.
+        ///</summary>
         private List<string> GenerateReturn(int stackSize) {
             List<string> result = new List<string>();
 
@@ -527,6 +563,10 @@ namespace dcc {
             return result;
         }
 
+        ///<summary>
+        /// Outputs a one-liner comment containing the function signature, for readability and
+        /// clarity in the outputted assembly.
+        ///</summary>
         private static string FunctionHeader(Function function) {
             string header = "# " + function.name + " (";
 

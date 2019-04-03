@@ -15,7 +15,7 @@ using System.IO;
 
 namespace dcc {
     static class Preprocessor {
-        public static List<string> ProcessAll(List<string> source) {
+        public static List<string> ProcessAll(List<string> source, bool enableStrout) {
             List<string> result = new List<string>();
             foreach (string line in source) {
                 result.Add(line);
@@ -23,6 +23,7 @@ namespace dcc {
 
             // This order is important.
             ProcessIncludes(result);
+            ProcessOutStringMacros(result, enableStrout);
             //TODO: #define statements!
             result = StripComments(result);
             StripWhiteSpace(result);
@@ -34,6 +35,28 @@ namespace dcc {
         private static void StripWhiteSpace(List<string> source) {
             for (int i = 0; i < source.Count; i++) {
                 source[i] = source[i].Trim();
+            }
+        }
+
+        private static void ProcessOutStringMacros(List<string> source, bool enableStrout) {
+            for (int i = 0; i < source.Count; i++) {
+                if (source[i].Trim().StartsWith("#pragma OutString")) {
+                    if (!enableStrout) {
+                        source[i] = "";
+                        continue;
+                    }
+
+                    string command = "";
+                    string theString = source[i].Trim().Split("OutString")[1].TrimStart();
+
+                    foreach (char c in theString.ToCharArray()) {
+                        command += "putc(" + ((int) c) + "); ";
+                    }
+
+                    command += "putc(10);";
+
+                    source[i] = command;
+                }
             }
         }
 

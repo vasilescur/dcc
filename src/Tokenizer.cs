@@ -16,7 +16,8 @@ using System.Linq;
 using static dcc.Token.TokenType;
 
 namespace dcc {
-    ///<summary>Represents one semantic unit of the source program.
+    ///<summary>
+    /// Represents one semantic unit of the source program.
     ///</summary>
     class Token {
         public string content;
@@ -27,6 +28,9 @@ namespace dcc {
             this.type = type;
         }
 
+        ///<summary>
+        /// Returns a user-friendly representation of this token
+        ///</summary>
         public override string ToString() {
             StringBuilder result = new StringBuilder("");
 
@@ -79,8 +83,9 @@ namespace dcc {
             Assembly,
         }
 
-        ///<summary>Checks whether this <c>Token</c> is one of the listed types of expression
-        ///operators.
+        ///<summary>
+        /// Checks whether this <c>Token</c> is one of the listed types of expression
+        /// operators.
         ///</summary>
         public static bool IsExpressionOperator(Token token) {
             return new List<TokenType> {
@@ -100,6 +105,7 @@ namespace dcc {
         List<string> variables = new List<string>();
         List<string> labels = new List<string>();
 
+        ///<value>Regular expression that matches valid variable or function names</value>
         static Regex validIdentifier = new Regex(@"[_a-zA-Z][_a-zA-Z0-9]*");
 
         public List<Token> Tokenize(List<string> source) {

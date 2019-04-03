@@ -6,22 +6,27 @@ using System.Text;
 namespace dcc {
     public static class StringBuilderExtension {
 
-        ///<summary>Implementation of the <c>String</c> class's <c>Substring</c method, but for the
+        ///<summary>
+        /// Implementation of the <c>String</c> class's <c>Substring</c method, but for the
         /// <s>StringBuilder</c>.
         ///</summary>
         public static string Substring(this StringBuilder value, int startPos, int length) {
             return value.ToString().Substring(startPos, length);
         }
 
-        ///<summary>Returns <c>true</c> if the <c>string</c> contained within this object starts
+        ///<summary>
+        /// Returns <c>true</c> if the <c>string</c> contained within this object starts
         /// with a specified <c>string</c>
         ///</summary>
         public static bool StartsWith(this StringBuilder sb, string value) {
             return sb.ToString().StartsWith(value);
         }
 
-        ///<summary>Returns the first <c>length</c> characters from the string, and then removes those
+        ///<summary>
+        /// Returns the first <c>length</c> characters from the string, and then removes those
         ///characters.
+        ///
+        /// Fun fact: The C# Roslyn compiler calls this <c>EatToken</c> :)
         ///</summary>
         public static string Consume(this StringBuilder sb, int length) {
             string result = sb.Substring(0, length);
@@ -29,7 +34,8 @@ namespace dcc {
             return result;
         }
 
-        ///<summary>Consumes until it finds a specified sentinel character, then stops. Does not Consume
+        ///<summary>
+        /// Consumes until it finds a specified sentinel character, then stops. Does not Consume
         /// the sentinel.
         ///</summary>
         public static string ConsumeUntil(this StringBuilder sb, string sentinel) {
@@ -38,8 +44,10 @@ namespace dcc {
             return sb.Consume(length);
         }
 
-        ///<summary>Keeps Consuming characters while a certain <c>predicate</c> is true, then stops. Does
+        ///<summary>
+        /// Keeps Consuming characters while a certain <c>predicate</c> is true, then stops. Does
         ///not consume the character that caused the <c>predicate</c> to return <c>false</c>.
+        ///</summary>
         public static string ConsumeWhile(this StringBuilder sb, Func<char, bool> predicate) {
             StringBuilder result = new StringBuilder("");
 
@@ -54,7 +62,8 @@ namespace dcc {
             }
         }
 
-        ///<summary>Trims the start of the string of any whitespace.
+        ///<summary>
+        /// Trims the start of the string of any whitespace.
         ///</summary>
         public static StringBuilder TrimStart(this StringBuilder sb) {
             return new StringBuilder(sb.ToString().TrimStart());

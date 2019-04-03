@@ -147,23 +147,6 @@ main:
     addi    $r6,    $r6,    1
     jal     putc
 
-    # [FunctionCall [Function putc --> Void] [Literal 97],
-    addi    $r6,    $r6,    -1
-    # [EvaluateExpression [Literal 97]]
-    addi    $r6,    $r6,    -1
-    sw      $r1,    0($r6)
-    xor     $r1,    $r1,    $r1
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    4
-    sw      $r1,    1($r6)
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    jal     putc
-
     # [FunctionCall [Function putc --> Void] [Literal 10],
     addi    $r6,    $r6,    -1
     # [EvaluateExpression [Literal 10]]
@@ -205,16 +188,16 @@ main:
     lw      $r2,    0($r6)
     lw      $r3,    1($r6)
     addi    $r1,    $r0,    1
-    beq     $r2,    $r3,    __beq_8
+    beq     $r2,    $r3,    __beq_7
     addi    $r1,    $r0,    0
-  __beq_8:
+  __beq_7:
     addi    $r6,    $r6,    2
     sw      $r1,    2($r6)
     lw      $r1,    0($r6)
     addi    $r6,    $r6,    1
     lw      $r1,    1($r6)
     addi    $r6,    $r6,    1
-    beq     $r1,    $r0,    __if_skip_9
+    beq     $r1,    $r0,    __if_skip_8
 
     # [FunctionCall [Function putc --> Void] [Literal 89],
     addi    $r6,    $r6,    -1
@@ -231,7 +214,21 @@ main:
     lw      $r1,    0($r6)
     addi    $r6,    $r6,    1
     jal     putc
-  __if_skip_9:
+
+    # [FunctionCall [Function putc --> Void] [Literal 10],
+    addi    $r6,    $r6,    -1
+    # [EvaluateExpression [Literal 10]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    10
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    jal     putc
+  __if_skip_8:
     addi    $r6,    $r6,    1
 
     # [If [Operation TestEq [Literal 1] [Literal 2]]]
@@ -287,8 +284,163 @@ main:
     lw      $r1,    0($r6)
     addi    $r6,    $r6,    1
     jal     putc
+
+    # [FunctionCall [Function putc --> Void] [Literal 10],
+    addi    $r6,    $r6,    -1
+    # [EvaluateExpression [Literal 10]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    10
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    jal     putc
   __if_skip_14:
     addi    $r6,    $r6,    1
+
+    # [FunctionCall [Function putc --> Void] [Operation Addition [Literal 48] [Operation Subtraction [Operation Addition [Literal 1] [Literal 6]] [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]]],
+    addi    $r6,    $r6,    -1
+    # [EvaluateExpression [Operation Addition [Literal 48] [Operation Subtraction [Operation Addition [Literal 1] [Literal 6]] [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]]]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r6,    $r6,    -2
+    # [EvaluateExpression [Literal 48]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    31
+    addi    $r1,    $r1,    17
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [EvaluateExpression [Operation Subtraction [Operation Addition [Literal 1] [Literal 6]] [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r6,    $r6,    -2
+    # [EvaluateExpression [Operation Addition [Literal 1] [Literal 6]]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r6,    $r6,    -2
+    # [EvaluateExpression [Literal 1]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    1
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [EvaluateExpression [Literal 6]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    6
+    sw      $r1,    2($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [Operation Addition [Literal 1] [Literal 6]]
+    lw      $r2,    0($r6)
+    lw      $r3,    1($r6)
+    add     $r1,    $r2,    $r3
+    addi    $r6,    $r6,    2
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [EvaluateExpression [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r6,    $r6,    -2
+    # [EvaluateExpression [Literal 2]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    2
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [EvaluateExpression [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r6,    $r6,    -2
+    # [EvaluateExpression [Operation Addition [Literal 4] [Literal 1]]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r6,    $r6,    -2
+    # [EvaluateExpression [Literal 4]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    4
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [EvaluateExpression [Literal 1]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    1
+    sw      $r1,    2($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [Operation Addition [Literal 4] [Literal 1]]
+    lw      $r2,    0($r6)
+    lw      $r3,    1($r6)
+    add     $r1,    $r2,    $r3
+    addi    $r6,    $r6,    2
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [EvaluateExpression [Literal 3]]
+    addi    $r6,    $r6,    -1
+    sw      $r1,    0($r6)
+    xor     $r1,    $r1,    $r1
+    addi    $r1,    $r1,    3
+    sw      $r1,    2($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]
+    lw      $r2,    0($r6)
+    lw      $r3,    1($r6)
+    sub     $r1,    $r2,    $r3
+    addi    $r6,    $r6,    2
+    sw      $r1,    2($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]
+    lw      $r2,    0($r6)
+    lw      $r3,    1($r6)
+    add     $r1,    $r2,    $r3
+    addi    $r6,    $r6,    2
+    sw      $r1,    2($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [Operation Subtraction [Operation Addition [Literal 1] [Literal 6]] [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]]
+    lw      $r2,    0($r6)
+    lw      $r3,    1($r6)
+    sub     $r1,    $r2,    $r3
+    addi    $r6,    $r6,    2
+    sw      $r1,    2($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    # [Operation Addition [Literal 48] [Operation Subtraction [Operation Addition [Literal 1] [Literal 6]] [Operation Addition [Literal 2] [Operation Subtraction [Operation Addition [Literal 4] [Literal 1]] [Literal 3]]]]]
+    lw      $r2,    0($r6)
+    lw      $r3,    1($r6)
+    add     $r1,    $r2,    $r3
+    addi    $r6,    $r6,    2
+    sw      $r1,    1($r6)
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    lw      $r1,    0($r6)
+    addi    $r6,    $r6,    1
+    jal     putc
 
     # [FunctionCall [Function putc --> Void] [Literal 10],
     addi    $r6,    $r6,    -1
