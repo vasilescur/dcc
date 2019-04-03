@@ -271,7 +271,7 @@ namespace dcc {
                     newVal,
                     target,
                     ref stackMap,
-                    0
+                    1
                 );
 
                 result.AddRange(steps);
@@ -393,7 +393,7 @@ namespace dcc {
                     // This is a simple one. Simply get the variable's value and put it in $r1
                     int sourceOffset = stackMap[(expression as Variable)];
 
-                    result.Add("    lw      $r1,    " + (sourceOffset + stackClobber) + "($r6)");
+                    result.Add("    lw      $r1,    " + (sourceOffset + stackClobber + 1) + "($r6)");
                 } else if (expression is SingleParamOperation) {
                     //TODO: Single parameter operators.
 
@@ -421,14 +421,14 @@ namespace dcc {
                         (expression as TwoParamOperation).operands[0],
                         leftOperand,
                         ref stackMap,
-                        1   //TODO: Why the hell does this even work? Lol
+                        stackClobber + 2
                     ));
 
                     result.AddRange(EvaluateExpression(
                         (expression as TwoParamOperation).operands[1],
                         rightOperand,
                         ref stackMap,
-                        1
+                        stackClobber + 2
                     ));
 
                     result.Add("    # " + (expression as TwoParamOperation).ToString());
