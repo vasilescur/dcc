@@ -218,7 +218,7 @@ namespace dcc {
                 // Evaluate all arguments -->
                 for (int argNum = 1; argNum <= numArgs; argNum++) {
                     Variable tempResult = new Variable() {
-                        name = "__temp_expr",
+                        name = "__temp_expr_" + UniqueIdentifier.NextStr(),
                         type = Variable.VarType.Int
                     };
 
@@ -286,7 +286,7 @@ namespace dcc {
                 Expression ifCond = (action as If).condition;
 
                 Variable tempResult = new Variable() {
-                    name = "__temp_expr",
+                    name = "__temp_expr_" + UniqueIdentifier.NextStr(),
                     type = Variable.VarType.Int
                 };
 
@@ -304,16 +304,16 @@ namespace dcc {
 
                 // Result is now in tempResult
 
-                result.Add("    sw      $r1,    1($r6)");
-                result.Add("    lw      $r1,    " + stackMap[tempResult] + "($r6)");
+                //result.Add("    sw      $r1,    1($r6)");
+                result.Add("    lw      $r1,    " + (stackMap[tempResult]+1) + "($r6)");
 
                 // Result of condition is now in $r1
                 // Can be either 1 or 0. If it's 1 --> keep going, but if it's 0 --> skip body.
                 string skipLabel = "__if_skip_" + UniqueIdentifier.NextStr();
 
-                result.Add("    beq     $r1,    $r0,    " + skipLabel); // If cond = 0 --> skip
-                result.Add("    lw      $r1,    1($r6)");
                 result.Add("    addi    $r6,    $r6,    1");
+                result.Add("    beq     $r1,    $r0,    " + skipLabel); // If cond = 0 --> skip
+                //result.Add("    lw      $r1,    1($r6)");
 
                 // Body of the IF block
                 foreach (Action ifAction in (action as If).ifActions) {
@@ -369,14 +369,17 @@ namespace dcc {
                 } else if (expression is SingleParamOperation) {
 
                 } else if (expression is TwoParamOperation) {
+                    // Get an ID
+                    string unique = UniqueIdentifier.NextStr();
+
                     // Evaluate the operands
                     Variable leftOperand = new Variable() {
-                        name = "__temp_leftop", 
+                        name = "__temp_leftop_" + unique, 
                         type = Variable.VarType.Int
                     };
 
                     Variable rightOperand = new Variable() {
-                        name = "__temp_rightop",
+                        name = "__temp_rightop_" + unique,
                         type = Variable.VarType.Int
                     };
 
@@ -388,19 +391,38 @@ namespace dcc {
                         (expression as TwoParamOperation).operands[0],
                         leftOperand,
                         ref stackMap,
-                        2
+                        1
                     ));
 
                     result.AddRange(EvaluateExpression(
                         (expression as TwoParamOperation).operands[1],
                         rightOperand,
                         ref stackMap,
-                        2
+                        1
                     ));
+
+                    result.Add("    # " + (expression as TwoParamOperation).ToString());
 
                     switch ((expression as TwoParamOperation).operationType) {
                         case Operation.OperationType.TestEq: {
-                            
+                            // Load both evaluated operands into registers
+                            result.Add("    lw      $r2,    " + (stackMap[leftOperand]) + "($r6)");
+                            result.Add("    lw      $r3,    " + (stackMap[rightOperand]) + "($r6)");
+
+                            // Get a unique ID
+                            string ifUnique = UniqueIdentifier.NextStr();
+
+                            // Assume they're equal
+                            result.Add("    addi    $r1,    $r0,    1");
+
+                            // If they are, done!
+                            result.Add("    beq     $r2,    $r3,    __beq_" + ifUnique);
+
+                            // Otherwise, $r1 <- 0
+                            result.Add("    addi    $r1,    $r0,    0");
+
+                            // Done
+                            result.Add("  __beq_" + ifUnique + ":");
                         } break;
 
                         case Operation.OperationType.TestGt: {
@@ -420,24 +442,39 @@ namespace dcc {
                         } break;
 
                         case Operation.OperationType.Addition: {
+                            // Load both evaluated operands into registers
+                            result.Add("    lw      $r2,    " + (stackMap[leftOperand]) + "($r6)");
+                            result.Add("    lw      $r3,    " + (stackMap[rightOperand]) + "($r6)");
 
+                            // Add them into another register
+                            result.Add("    add     $r1,    $r2,    $r3");
                         } break;
 
                         case Operation.OperationType.Subtraction: {
+                            // Load both evaluated operands into registers
+                            result.Add("    lw      $r2,    " + (stackMap[leftOperand]) + "($r6)");
+                            result.Add("    lw      $r3,    " + (stackMap[rightOperand]) + "($r6)");
 
+                            // Subtract them into another register
+                            result.Add("    sub     $r1,    $r2,    $r3");
                         } break;
 
                         case Operation.OperationType.Xor: {
+                            // Load both evaluated operands into registers
+                            result.Add("    lw      $r2,    " + (stackMap[leftOperand]) + "($r6)");
+                            result.Add("    lw      $r3,    " + (stackMap[rightOperand]) + "($r6)");
 
+                            // XOR them into another register
+                            result.Add("    xor     $r1,    $r2,    $r3");
                         } break;
 
-                        case Operation.OperationType.ShiftLeft: {
+                        // case Operation.OperationType.ShiftLeft: {
 
-                        } break;
+                        // } break;
 
-                        case Operation.OperationType.ShiftRight: {
+                        // case Operation.OperationType.ShiftRight: {
 
-                        } break;
+                        // } break;
 
                         default: {
                             throw new InvalidOperationException(

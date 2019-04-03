@@ -138,6 +138,7 @@ namespace dcc {
 
                     // Now, we need the actions/instructions contained in the function!
                     this.currentLocals = new List<Variable>();
+                    this.currentLocals.AddRange(newArgs);
                     List<Action> actions = ParseBlock();
 
                     this.program.functions.Add(new Function() {
@@ -353,6 +354,11 @@ namespace dcc {
                     continue;
                 }
 
+                if (Peek().type == Token.TokenType.BraceOpen) {
+                    Consume(Token.TokenType.BraceOpen);
+                    continue;
+                }
+
                 // Instructions
                 if (Peek().type == Token.TokenType.FuncName) {  // Means we are calling a void function
                     string fnName = Consume(Token.TokenType.FuncName).content;
@@ -440,6 +446,8 @@ namespace dcc {
                     Consume(Token.TokenType.ParenOpen);
 
                     Expression condition = ParseExpression();
+
+                    Consume(Token.TokenType.ParenClose);
 
                     List<Action> body = ParseBlock();
 

@@ -111,8 +111,8 @@ namespace dcc {
             // Then, tokenize!
             StringBuilder restSource = new StringBuilder(fullSource);
 
-            //TODO: Debug only
-            int done = 0;
+            //// Debug only
+            ////int done = 0;
 
             do {
                 // Fast-forward to the beginning of the next token, if needed
@@ -121,8 +121,8 @@ namespace dcc {
                 Token nextToken = consumeNextToken(ref restSource);
                 lastToken = nextToken;
                 result.Add(nextToken);
-                done++;
-            } while (result.Last().type != EOF && done < 100);
+                ////done++;
+            } while (result.Last().type != EOF /*&& done < 100*/);
 
             return result;
         }
