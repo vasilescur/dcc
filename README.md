@@ -6,7 +6,7 @@ This project is still very much a work in progress. The end goal is to be able t
 language to be sufficient for general-purpose demonstrations and implementation of simple algorithms. If I can eventually get 
 `HoopsStats.c` compiled and running on this, I'll be a happy man.
 
-**Completion Status**: `75%`. As of now, it can compile full programs and call functions and produce I/O, but is missing any sort of math, expression evaluation beyond literals, control flow, or complex operations. Currently working on operation/`Expression` evaluation.
+**Completion Status**: `80%`. As of now, it can compile full programs and call functions and produce I/O, as well as support for `if` statements, local variables, addition/subtraction, inline ASM. Currently working on debugging some local var stack management stuff.
 
 ## Instructions
 
