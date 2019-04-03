@@ -214,11 +214,6 @@ int getc() {
 
 int main() {
     putc('H');
-    putc('e');
-    putc('l');
-    putc('l');
-    putc('o');
-    putc('!');
     putc(10);   // \n
 
     return 0;
@@ -310,89 +305,6 @@ main:
     addi    $r1,    $r1,    31
     addi    $r1,    $r1,    31
     addi    $r1,    $r1,    10
-    sw      $r1,    1($r6)
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    jal     putc
-
-    # [FunctionCall [Function putc --> Void] [Literal 101],
-    addi    $r6,    $r6,    -1
-    # [EvaluateExpression [Literal 101]]
-    addi    $r6,    $r6,    -1
-    sw      $r1,    0($r6)
-    xor     $r1,    $r1,    $r1
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    8
-    sw      $r1,    1($r6)
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    jal     putc
-
-    # [FunctionCall [Function putc --> Void] [Literal 108],
-    addi    $r6,    $r6,    -1
-    # [EvaluateExpression [Literal 108]]
-    addi    $r6,    $r6,    -1
-    sw      $r1,    0($r6)
-    xor     $r1,    $r1,    $r1
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    15
-    sw      $r1,    1($r6)
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    jal     putc
-
-    # [FunctionCall [Function putc --> Void] [Literal 108],
-    addi    $r6,    $r6,    -1
-    # [EvaluateExpression [Literal 108]]
-    addi    $r6,    $r6,    -1
-    sw      $r1,    0($r6)
-    xor     $r1,    $r1,    $r1
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    15
-    sw      $r1,    1($r6)
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    jal     putc
-
-    # [FunctionCall [Function putc --> Void] [Literal 111],
-    addi    $r6,    $r6,    -1
-    # [EvaluateExpression [Literal 111]]
-    addi    $r6,    $r6,    -1
-    sw      $r1,    0($r6)
-    xor     $r1,    $r1,    $r1
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    18
-    sw      $r1,    1($r6)
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    lw      $r1,    0($r6)
-    addi    $r6,    $r6,    1
-    jal     putc
-
-    # [FunctionCall [Function putc --> Void] [Literal 33],
-    addi    $r6,    $r6,    -1
-    # [EvaluateExpression [Literal 33]]
-    addi    $r6,    $r6,    -1
-    sw      $r1,    0($r6)
-    xor     $r1,    $r1,    $r1
-    addi    $r1,    $r1,    31
-    addi    $r1,    $r1,    2
     sw      $r1,    1($r6)
     lw      $r1,    0($r6)
     addi    $r6,    $r6,    1
