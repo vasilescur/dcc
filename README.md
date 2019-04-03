@@ -180,7 +180,7 @@ the stack.
 ### Compiler Features
 
 - [ ] Proper error reporting (line number, etc)
-
+- [x] Preprocessor macro for printing a string (`#pragma OutString Hello, world!` --> `putc('H'); putc('e'); ...`)
 
 ## Example
 
