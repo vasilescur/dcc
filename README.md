@@ -169,7 +169,7 @@ the stack.
 - [x] Input and output library (`putc`, `getc`)
 - [ ] Control flow statements and blocks
     - [ ] Labels and `goto`
-    - [ ] `if` and `else`
+    - [x] `if` and `else`
     - [ ] `for` and `while` loops
     - [ ] `switches` (long-term, low-priority)
 - [ ] `enum`s (low-priority)

@@ -425,21 +425,21 @@ namespace dcc {
                             result.Add("  __beq_" + ifUnique + ":");
                         } break;
 
-                        case Operation.OperationType.TestGt: {
+                        // case Operation.OperationType.TestGt: {
 
-                        } break;
+                        // } break;
 
-                        case Operation.OperationType.TestLt: {
+                        // case Operation.OperationType.TestLt: {
 
-                        } break;
+                        // } break;
 
-                        case Operation.OperationType.TestGeq: {
+                        // case Operation.OperationType.TestGeq: {
 
-                        } break;
+                        // } break;
 
-                        case Operation.OperationType.TestLeq: {
+                        // case Operation.OperationType.TestLeq: {
 
-                        } break;
+                        // } break;
 
                         case Operation.OperationType.Addition: {
                             // Load both evaluated operands into registers
