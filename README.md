@@ -34,7 +34,8 @@ Duke 250/16 architecture.
 #### Duke 250/16 assembler and simulator
 
 There is an assembler and simulator for the Duke 250/16 packaged with this
-repository, included in the `asm-sim` folder. These are not written by me. For more information about these programs, please contact Professor Daniel Sorin, Duke University.
+repository, included in the `asm-sim` folder. These are not written by me. For more information about these 
+programs, please contact Professor Daniel Sorin at Duke University.
 
 To assemble and run the compiled program, first build the assembler and simulator from source:
 
