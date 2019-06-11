@@ -1,7 +1,7 @@
 <p align="center">
     <img src="logo.png" height="250px">
     <br/>
-    This is a C compiler targeting the Duke 250/16 architecture.
+        A subset-of-C compiler targeting the Duke 250/16 architecture.
 </p>
 
 <br/>
