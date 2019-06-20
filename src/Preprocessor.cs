@@ -24,7 +24,7 @@ namespace dcc {
             // This order is important.
             ProcessIncludes(result);
             ProcessOutStringMacros(result, enableStrout);
-            //TODO: #define statements!
+            ProcessDefines(result);
             result = StripComments(result);
             StripWhiteSpace(result);
             StripEmptyLines(result);
@@ -122,6 +122,62 @@ namespace dcc {
 
                 source.InsertRange(include.Key, includedContent);
             }
+        }
+
+        /// <summary>Parses through the contents of the file to replace all uses of a #define-d keyword
+        /// with its value.
+        ///</summary>
+        ///<author> Jake Derry </author>
+        private static void ProcessDefines(List<string> source) {
+            Dictionary <string, string> requestedDefines = new Dictionary<string, string>();
+
+            for (int i = 0; i < source.Count; i++) {
+                if (source[i].StartsWith("#define")) {
+                    // add the define to the requestedDefines
+                    string[] splitSourceLine = source[i].Split(" ");
+
+                    string[] defValueSplit = new string[splitSourceLine.Length - 2];
+                    Array.Copy(splitSourceLine, 2, defValueSplit, 0, defValueSplit.Length);
+
+                    string defWord = splitSourceLine[1];
+                    requestedDefines.Add(defWord, String.Join(" ", defValueSplit));
+
+                    // comment out the line
+                    source[i] = "//" + source[i];
+                } // if
+                else {
+
+                    // skip commented lines
+                    if (source[i].StartsWith("//")) continue;
+
+                    List<String> definesSorted = requestedDefines.Keys.ToList();
+                    definesSorted.Sort();
+                    definesSorted.Reverse();
+                    
+                    string[] splitSourceLine = source[i].Split(" ");
+                    foreach(String defKey in definesSorted) {
+                        for (int j = 0; j < splitSourceLine.Length; j++) {
+                            if (splitSourceLine[j].StartsWith('"') || 
+                            splitSourceLine[j].StartsWith("'")) 
+                                continue;
+
+                            if (splitSourceLine[j].Equals(defKey)) 
+                                splitSourceLine[j] = requestedDefines[defKey];
+                            else {
+                                int keyDex = splitSourceLine[j].IndexOf(defKey);
+                                int keyDexEnd = keyDex + defKey.Length;
+                                if (keyDex != -1) {
+                                    splitSourceLine[j] = splitSourceLine[j].Substring(0, keyDex) + 
+                                                        requestedDefines[defKey] + 
+                                                        splitSourceLine[j].Substring(keyDexEnd, splitSourceLine[j].Length - keyDexEnd);
+                                } // if
+                            } // else
+                        } // for
+                    } // foreach
+                    source[i] = String.Join(" ", splitSourceLine);
+                } // else
+                
+            } // for
         }
     }
 }
